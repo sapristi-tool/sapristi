@@ -26,19 +26,19 @@ RSpec.describe MonitorManager do
 		before(:each) { expect(under_test).to receive(:list_monitors).and_return(xrandr_example) }
 
 		it 'get a monitor' do
-			expect(under_test.get_monitor(a_monitor_name)).to eql(a_monitor)
+			expect(under_test.get_monitor(a_monitor_name)).to eq(a_monitor)
 		end
 
 		it 'get another monitor' do
-			expect(under_test.get_monitor(another_monitor_name)).to eql(another_monitor)
+			expect(under_test.get_monitor(another_monitor_name)).to eq(another_monitor)
 		end
 
 		it 'get main monitor when monitor name not found' do
-			expect(under_test.get_monitor("none")).to eql(main_monitor)
+			expect(under_test.get_monitor("none")).to eq(main_monitor)
 		end
 
 		it 'get main monitor when monitor name is nil' do
-			expect(under_test.get_monitor(nil)).to eql(main_monitor)
+			expect(under_test.get_monitor(nil)).to eq(main_monitor)
 		end
 	end
 end
