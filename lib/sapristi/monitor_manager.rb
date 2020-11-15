@@ -1,7 +1,13 @@
 module Sapristi
 	class MonitorManager
 		def get_monitor name
-			monitors[name]
+			available_monitors = monitors
+
+			return available_monitors[name] if available_monitors[name]
+
+			main = available_monitors.values.find {|m| m["main"] }
+			puts "Monitor #{name} not found. Using #{main['name']}, available=#{available_monitors.keys.join(', ')}" if name
+			main
 		end
 
 		private
