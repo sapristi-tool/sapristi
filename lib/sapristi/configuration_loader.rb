@@ -6,7 +6,7 @@ module Sapristi
 		def initialize
 			@monitor_manager = MonitorManager.new
 		end
-		
+
 		def load file
 			table = CSV.read(file, headers: true, col_sep: SEPARATOR)
 			raise Error, "Invalid configuration file: headers=#{table.headers.join(', ')}, valid=#{valid_headers.join(', ')}" if !table.headers.eql? valid_headers
@@ -31,21 +31,18 @@ module Sapristi
 			translations = { "H-size" => "x", "V-size" => "y", "X-position" => "x", "Y-position" => "y" }
 			normalized = definition.to_h.keys.each_with_object({}) do |k, memo|
 				m = definition[k]&.to_s&.match(/^([0-9]{1,2})%$/)
-				m2 = definition[k]&.to_s&.match(/^([0-9]+)$/)
 				if m
 					if translations[k]
 						memo[k] = (monitor[translations[k]] * (m[1].to_i / 100.0)).to_i
 					else
 						raise "#{k}=#{definition[k]}, using percentage in invalid field, valid=#{translations.keys.join(', ')}"
 					end
-				elsif m2
-					memo[k] = definition[k].to_i
 				else
 					memo[k] = definition[k]
 				end
 			end
 
-			translations.keys.each {|k| normalized[k] = normalized[k].to_i }
+			(translations.keys + %w(Workspace)).each {|k| normalized[k] = normalized[k].to_i }
 			normalized
 		end
 	end
