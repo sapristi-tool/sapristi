@@ -36,5 +36,9 @@ RSpec.describe MonitorManager do
 		it 'get main monitor when monitor name not found' do
 			expect(under_test.get_monitor("none")).to eql(main_monitor)
 		end
+
+		it 'get main monitor when monitor name is nil' do
+			expect(under_test.get_monitor(nil)).to eql(main_monitor)
+		end
 	end
 end
