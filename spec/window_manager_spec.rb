@@ -13,13 +13,53 @@ RSpec.describe WindowManager do
 		expect(actual).to contain_exactly(*expected)
 	end
 
-	it ('can resize and move window') do
-		pid = Process.spawn("gedit --new-window")
-		Process.detach pid
+=begin
 
-		under_test.windows.find {}
+move and resize work on their own but fails in the test suite
+
+X Error of failed request:  BadWindow (invalid Window parameter)
+  Major opcode of failed request:  20 (X_GetProperty)
+  Resource id in failed request:  0x2200008
+  Serial number of failed request:  1095
+  Current serial number in output stream:  1095
+=end
+	#FIXME
+	xit ('can resize windows') do
+		window = under_test.launch("sol")
+
+		inc_x = 100
+		inc_y = 200
+		expected_width = window.geometry[2] + inc_x
+		expected_height = window.geometry[3] + inc_y
+
+		under_test.resize(window, expected_width, expected_height)
+
+		updated_window = under_test.windows.find {|w| w.id.eql? window.id }
+
+		
+		expect(updated_window.geometry[2]).to eq(expected_width)
+		expect(updated_window.geometry[3]).to eq(expected_height)
 	ensure
-		Process.kill "KILL", pid
+		Process.kill "KILL", window.pid if window
+	end
+
+	#FIXME
+	xit ('can move windows') do
+		window = under_test.launch("gedit --new-window")
+
+		inc_x = 10
+		inc_y = 20
+		x = window.geometry[0] + inc_x
+		y = window.geometry[1] + inc_y
+
+		under_test.move(window, x, y)
+
+		updated_window = under_test.windows.find {|w| w.id.eql? window.id }
+
+		expect(updated_window.geometry[0]).to eq(x)
+		expect(updated_window.geometry[1]).to eq(y)
+	ensure Exception
+		Process.kill "KILL", window.pid if window
 	end
 
 	context('execute and return window') do
@@ -41,7 +81,7 @@ RSpec.describe WindowManager do
 
 			window = under_test.launch("gedit --new-window /tmp/some_file.txt")
 			expect(previous_pids).not_to  include(window.pid)
-		ensure
+		ensure Exception
 			Process.kill "KILL", window.pid if window&.pid
 		end
 

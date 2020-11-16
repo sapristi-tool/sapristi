@@ -46,5 +46,20 @@ module Sapristi
 			puts "Found window title=#{process_window.title} for process=#{process_pid}!"
 			process_window
 		end
+
+		GRAVITY = 0
+		def resize(window, width, height)
+			x = window.geometry[0]
+			y = window.geometry[1]
+
+			@display.action_window(window.id, :move_resize, GRAVITY, x, y, width, height)
+		end
+
+		def move(window, x, y)
+			width = window.geometry[2]
+			height = window.geometry[3]
+
+			@display.action_window(window.id, :move_resize, GRAVITY, x, y, width, height)
+		end
 	end
 end
