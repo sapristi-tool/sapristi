@@ -12,7 +12,7 @@ module Sapristi
 			raise Error, "Invalid configuration file: headers=#{table.headers.join(', ')}, valid=#{valid_headers.join(', ')}" if !table.headers.eql? valid_headers
 
 			table.each_with_index do |definition, index|
-				definition["Line"] = index
+				#definition["Line"] = index
 			end
 
 			table.map{|definition| normalize(definition) }
@@ -20,11 +20,27 @@ module Sapristi
 			raise Error, "Configuration file not found: #{file}"
 		end
 
-		private
 		def valid_headers
 			%w(Title Command Monitor X-position Y-position H-size V-size Workspace)
 		end
 
+		def create_empty_configuration conf_file
+			raise Error, "Trying to write empty configuration on existing file #{conf_file}" if File.exists? conf_file
+			File.write(conf_file, valid_headers.join(SEPARATOR))
+		end
+
+		def save conf_file, definitions
+			raise Error, "Trying to write configuration on existing file #{conf_file}" if File.exists? conf_file
+
+			CSV.open(conf_file, "wb", write_headers: true, headers: valid_headers, col_sep: SEPARATOR) do |csv|
+				definitions.each do |definition|
+					csv << valid_headers.map {|k| definition.has_key?(k + NORMALIZED_FIELD_SUFFIX) ? definition[k + NORMALIZED_FIELD_SUFFIX] : definition[k] }
+				end
+			end
+		end
+
+		private
+		NORMALIZED_FIELD_SUFFIX = "_raw"
 		def normalize definition
 			monitor = @monitor_manager.get_monitor definition["monitor"]
 
@@ -34,6 +50,7 @@ module Sapristi
 				if m
 					if translations[k]
 						memo[k] = (monitor[translations[k]] * (m[1].to_i / 100.0)).to_i
+						memo[k + NORMALIZED_FIELD_SUFFIX] = definition[k]
 					else
 						raise "#{k}=#{definition[k]}, using percentage in invalid field, valid=#{translations.keys.join(', ')}"
 					end
@@ -42,7 +59,7 @@ module Sapristi
 				end
 			end
 
-			(translations.keys + %w(Workspace)).each {|k| normalized[k] = normalized[k].to_i }
+			(translations.keys + %w(Workspace Monitor)).each {|k| normalized[k] = normalized[k].to_i if normalized[k] }
 			normalized
 		end
 	end
