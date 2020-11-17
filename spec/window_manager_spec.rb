@@ -23,6 +23,7 @@ RSpec.describe WindowManager do
 		expected_width = window.geometry[2] + inc_x
 		expected_height = window.geometry[3] + inc_y
 		under_test.resize(window, expected_width, expected_height)
+		sleep 1
 
 		updated_window = under_test.windows.find {|w| w.id.eql? window.id }
 
