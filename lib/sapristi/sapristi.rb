@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sapristi
   class Sapristi
     def initialize(configuration_loader: ConfigurationLoader.new, definition_processor: DefinitionProcessor.new)

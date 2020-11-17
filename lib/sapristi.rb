@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sapristi/version'
 require 'sapristi/monitor_manager'
 require 'sapristi/configuration_loader'

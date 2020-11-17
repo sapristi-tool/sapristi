@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'csv'
 
 module Sapristi
   class ConfigurationLoader
-    SEPARATOR = ','.freeze
+    SEPARATOR = ','
     def initialize
       @monitor_manager = MonitorManager.new
     end
@@ -37,14 +39,14 @@ module Sapristi
 
       CSV.open(conf_file, 'wb', write_headers: true, headers: valid_headers, col_sep: SEPARATOR) do |csv|
         definitions.each do |definition|
-          csv << valid_headers.map { |k| definition.has_key?(k + NORMALIZED_FIELD_SUFFIX) ? definition[k + NORMALIZED_FIELD_SUFFIX] : definition[k] }
+          csv << valid_headers.map { |k| definition.key?(k + NORMALIZED_FIELD_SUFFIX) ? definition[k + NORMALIZED_FIELD_SUFFIX] : definition[k] }
         end
       end
     end
 
     private
 
-    NORMALIZED_FIELD_SUFFIX = '_raw'.freeze
+    NORMALIZED_FIELD_SUFFIX = '_raw'
     def normalize(definition)
       monitor = @monitor_manager.get_monitor definition['monitor']
 

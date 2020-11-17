@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sapristi
   class DefinitionProcessor
     def initialize(window_manager = WindowManager.new)

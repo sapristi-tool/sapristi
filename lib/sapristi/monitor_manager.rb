@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sapristi
   class MonitorManager
     def get_monitor(name)
