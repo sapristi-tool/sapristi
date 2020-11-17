@@ -13,25 +13,15 @@ RSpec.describe WindowManager do
 		expect(actual).to contain_exactly(*expected)
 	end
 
-=begin
 
-move and resize work on their own but fails in the test suite
-
-X Error of failed request:  BadWindow (invalid Window parameter)
-  Major opcode of failed request:  20 (X_GetProperty)
-  Resource id in failed request:  0x2200008
-  Serial number of failed request:  1095
-  Current serial number in output stream:  1095
-=end
 	#FIXME
-	xit ('can resize windows') do
+	it ('can resize windows') do		
 		window = under_test.launch("sol")
 
-		inc_x = 100
-		inc_y = 200
+		inc_x = -10
+		inc_y = -20
 		expected_width = window.geometry[2] + inc_x
 		expected_height = window.geometry[3] + inc_y
-
 		under_test.resize(window, expected_width, expected_height)
 
 		updated_window = under_test.windows.find {|w| w.id.eql? window.id }
@@ -40,11 +30,12 @@ X Error of failed request:  BadWindow (invalid Window parameter)
 		expect(updated_window.geometry[2]).to eq(expected_width)
 		expect(updated_window.geometry[3]).to eq(expected_height)
 	ensure
-		Process.kill "KILL", window.pid if window
+		#Process.kill "KILL", window.pid if window
+		under_test.close(window) if window
 	end
 
 	#FIXME
-	xit ('can move windows') do
+	it ('can move windows') do
 		window = under_test.launch("gedit --new-window")
 
 		inc_x = 10
@@ -53,13 +44,44 @@ X Error of failed request:  BadWindow (invalid Window parameter)
 		y = window.geometry[1] + inc_y
 
 		under_test.move(window, x, y)
+		sleep 1
 
 		updated_window = under_test.windows.find {|w| w.id.eql? window.id }
 
 		expect(updated_window.geometry[0]).to eq(x)
 		expect(updated_window.geometry[1]).to eq(y)
 	ensure Exception
-		Process.kill "KILL", window.pid if window
+		#Process.kill "KILL", window.pid if window
+		under_test.close(window) if window
+	end
+
+	it 'find one window by title' do
+		window = under_test.launch("gedit --new-window deleteme_title.txt")
+
+		actual_windows = under_test.find_window(/deleteme_title.txt/).map(&:to_h).map {|w| w.reject { |k| k.eql? :active } }
+		expect(actual_windows).to eq([window.to_h.reject { |k| k.eql? :active }])
+	ensure
+		#Process.kill "KILL", window.pid if window
+		under_test.close(window) if window
+	end
+
+	it 'find two windows by title' do
+		window1 = under_test.launch("gedit --new-window deleteme_title.txt")
+		window2 = under_test.launch("sol")
+
+		actual_windows = under_test.find_window(/deleteme_title.txt|Klondike/).map &:to_h
+		expect(actual_windows.to_a).to have(2).items
+		#expect(actual_windows.map(&:title)).to
+	ensure
+		#Process.kill "KILL", window1.pid if window1
+		#Process.kill "KILL", window2.pid if window2
+		under_test.close(window1) if window1
+		under_test.close(window2) if window2
+	end
+
+	it 'returns empty list when window not found' do
+		actual_windows = under_test.find_window(/no window title/).map &:to_h
+		expect(actual_windows.to_a).to have(0).items
 	end
 
 	context('execute and return window') do
@@ -82,7 +104,8 @@ X Error of failed request:  BadWindow (invalid Window parameter)
 			window = under_test.launch("gedit --new-window /tmp/some_file.txt")
 			expect(previous_pids).not_to  include(window.pid)
 		ensure Exception
-			Process.kill "KILL", window.pid if window&.pid
+			#Process.kill "KILL", window.pid if window&.pid
+			under_test.close(window) if window.pid
 		end
 
 

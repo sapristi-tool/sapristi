@@ -10,6 +10,26 @@ module Sapristi
 			@display.windows
 		end
 
+		def close window
+			@display.action_window(window.id, :close)
+
+=begin
+
+sleep to allow a Graceful Dead (tm) to the window process
+
+X Error of failed request:  BadWindow (invalid Window parameter)
+  Major opcode of failed request:  20 (X_GetProperty)
+  Resource id in failed request:  0x2200008
+  Serial number of failed request:  1095
+  Current serial number in output stream:  1095
+=end
+			sleep 1
+		end
+
+		def find_window title_regex
+			@display.windows title: title_regex
+		end
+
 		def launch cmd, timeout_in_seconds = 30
 			windows = @display.windows
 			windows_data = windows.map {|w| w.to_h }
@@ -39,7 +59,8 @@ module Sapristi
 			end
 
 			if process_window.nil?
-				Process.kill"KILL", process_pid
+				Process.kill "KILL", process_pid
+				#sleep 1 # XLIB error for op code
 				raise Error, "Error executing process, it didn't open a window"
 			end
 
