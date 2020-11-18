@@ -25,24 +25,24 @@ module Sapristi
       is_expected.to(receive(:list_monitors).and_wrap_original { |_m, *_args| `axrandr --listmonitors` })
 
       expect { subject.get_monitor(nil) }.to raise_error(Error, /Error fetching monitor information/)
-    end
+    end      
 
-    context 'monitors found' do
+    context('#get_monitor') do
       before(:each) { is_expected.to receive(:list_monitors).and_return(xrandr_example) }
 
-      it 'get a monitor' do
+      it 'a monitor' do
         expect(subject.get_monitor(a_monitor_name)).to eq(a_monitor)
       end
 
-      it 'get another monitor' do
+      it 'another monitor' do
         expect(subject.get_monitor(another_monitor_name)).to eq(another_monitor)
       end
 
-      it 'get main monitor when monitor name not found' do
+      it 'main monitor when monitor name not found' do
         expect(subject.get_monitor('none')).to eq(main_monitor)
       end
 
-      it 'get main monitor when monitor name is nil' do
+      it 'main monitor when monitor name is nil' do
         expect(subject.get_monitor(nil)).to eq(main_monitor)
       end
     end
