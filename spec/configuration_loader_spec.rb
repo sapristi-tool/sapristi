@@ -37,18 +37,18 @@ module Sapristi
     let(:valid_csv_definitions) do
       [
         { 'Title' => nil, 'Command' => 'some', 'Monitor' => nil, 'X-position' => 1,
-        	'Y-position' => 2, 'H-size' => 3, 'V-size' => 4, 'Workspace' => 5 },
+          'Y-position' => 2, 'H-size' => 3, 'V-size' => 4, 'Workspace' => 5 },
         { 'Title' => 'some title', 'Command' => nil, 'Monitor' => 6, 'X-position' => 7,
-        	'Y-position' => 8, 'H-size' => 9, 'V-size' => 10, 'Workspace' => 11 },
+          'Y-position' => 8, 'H-size' => 9, 'V-size' => 10, 'Workspace' => 11 },
         { 'Title' => 'some title', 'Command' => nil, 'Monitor' => 0, 'X-position' => '10%',
-        	'Y-position' => '20%', 'H-size' => '30%', 'V-size' => '40%', 'Workspace' => 11 }
+          'Y-position' => '20%', 'H-size' => '30%', 'V-size' => '40%', 'Workspace' => 11 }
       ]
     end
 
     context('load') do
       it 'raises an error when configuration file is not found' do
         expect do
-        	under_test.load(non_existing_file)
+          under_test.load(non_existing_file)
         end.to raise_error(Error, /Configuration file not found: #{non_existing_file}/)
       end
 
@@ -63,7 +63,7 @@ module Sapristi
         file.close
 
         expect do
-        	under_test.create_empty_configuration file.path
+          under_test.create_empty_configuration file.path
         end.to raise_error Error, /Trying to write empty configuration on existing file #{file.path}/
       ensure
         file.unlink
@@ -74,7 +74,7 @@ module Sapristi
         file.close
 
         expect do
-        	under_test.save file.path, nil
+          under_test.save file.path, nil
         end.to raise_error Error, /Trying to write configuration on existing file #{file.path}/
       ensure
         file.unlink
@@ -107,7 +107,7 @@ module Sapristi
       let(:content) { under_test.load(valid_csv) }
 
       let(:xrandr_example) do
-        %Q(Monitors: 2
+        %(Monitors: 2
 	 0: +*some 3840/597x2160/336+0+0  DP-1
 	 1: +another 1920/509x1080/286+3840+0  HDMI-1)
       end
@@ -124,9 +124,8 @@ module Sapristi
 
         %w[X-position Y-position H-size V-size].each do |field|
           monitor = { id: 0, name: 'some',
-          						main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0 }.transform_keys(&:to_s)
+                      main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0 }.transform_keys(&:to_s)
           allow_any_instance_of(MonitorManager).to receive(:list_monitors).and_return(xrandr_example)
-
 
           expected = ((valid_csv_definitions[2][field][0..-2].to_i / 100.0) * monitor[translations[field]]).to_i
           expect(content[2][field]).to be expected

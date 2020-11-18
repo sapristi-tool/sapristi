@@ -16,7 +16,7 @@ module Sapristi
         name: another_monitor_name, main: nil, x: 1920, y: 1080, offset_x: 3840, offset_y: 0 }.transform_keys(&:to_s)
     end
     let(:xrandr_example) do
-      %Q(Monitors: 2
+      %(Monitors: 2
    0: +*#{a_monitor_name} 3840/597x2160/336+0+0  DP-1
    1: +#{another_monitor_name} 1920/509x1080/286+3840+0  HDMI-1)
     end
