@@ -22,7 +22,7 @@ module Sapristi
     end
 
     it 'raises an error if xrandr execution fails' do
-      expect(under_test).to receive(:list_monitors).and_wrap_original { |_m, *_args| `axrandr --listmonitors` }
+      expect(under_test).to(receive(:list_monitors).and_wrap_original { |_m, *_args| `axrandr --listmonitors` })
 
       expect { under_test.get_monitor(nil) }.to raise_error(Error, /Error fetching monitor information/)
     end

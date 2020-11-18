@@ -12,11 +12,9 @@ module Sapristi
     def load(file)
       table = CSV.read(file, headers: true, col_sep: SEPARATOR)
       unless table.headers.eql? valid_headers
-        raise Error, "Invalid configuration file: headers=#{table.headers.join(', ')}, valid=#{valid_headers.join(', ')}"
-      end
-
-      table.each_with_index do |definition, index|
-        # definition["Line"] = index
+        actual_headers = table.headers.join(', ')
+        expected_headers = valid_headers.join(', ')
+        raise Error, "Invalid configuration file: headers=#{actual_headers}, valid=#{expected_headers}"
       end
 
       table.map { |definition| normalize(definition) }
@@ -50,26 +48,35 @@ module Sapristi
     private
 
     NORMALIZED_FIELD_SUFFIX = '_raw'
+    TRANSLATIONS = { 'H-size' => 'x', 'V-size' => 'y', 'X-position' => 'x', 'Y-position' => 'y' }.freeze
+    NUMERIC_FIELDS = (TRANSLATIONS.keys + %w[Workspace Monitor]).freeze
     def normalize(definition)
       monitor = @monitor_manager.get_monitor definition['monitor']
 
-      translations = { 'H-size' => 'x', 'V-size' => 'y', 'X-position' => 'x', 'Y-position' => 'y' }
       normalized = definition.to_h.keys.each_with_object({}) do |k, memo|
-        m = definition[k]&.to_s&.match(/^([0-9]{1,2})%$/)
-        if m
-          if translations[k]
-            memo[k] = (monitor[translations[k]] * (m[1].to_i / 100.0)).to_i
-            memo[k + NORMALIZED_FIELD_SUFFIX] = definition[k]
-          else
-            raise "#{k}=#{definition[k]}, using percentage in invalid field, valid=#{translations.keys.join(', ')}"
-          end
+        is_percentage = definition[k]&.to_s&.match(/^([0-9]{1,2})%$/)
+
+        if is_percentage
+          value = apply_percentage k, definition[k], monitor
+          memo[k] = value[:value]
+          memo[k + NORMALIZED_FIELD_SUFFIX] = value[:raw]
         else
           memo[k] = definition[k]
         end
       end
 
-      (translations.keys + %w[Workspace Monitor]).each { |k| normalized[k] = normalized[k].to_i if normalized[k] }
+      NUMERIC_FIELDS.each { |k| normalized[k] = normalized[k].to_i if normalized[k] }
       normalized
+    end
+
+    def apply_percentage(key, raw, monitor)
+      applicable = TRANSLATIONS[key]
+      raise "#{key}=#{raw}, using percentage in invalid field, valid=#{TRANSLATIONS.keys.join(', ')}" unless applicable
+
+      m = raw&.to_s&.match(/^([0-9]{1,2})%$/)
+      value = (monitor[TRANSLATIONS[key]] * (m[1].to_i / 100.0)).to_i
+
+      { value: value, raw: raw }
     end
   end
 end
