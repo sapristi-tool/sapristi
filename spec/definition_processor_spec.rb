@@ -16,6 +16,17 @@ module Sapristi
         expect(window_manager).to have_received(:launch).with(command)
       end
 
+      it('uses window when found by title') do
+        window_manager = spy('window_manager')
+        window = double('window', pid: 1, title: "title")
+        allow(window_manager).to receive(:find_window).with(/Klondike/).and_return([window])
+
+        DefinitionProcessor.new(window_manager).process_definition({ 'Title' => 'Klondike', 'Command' => command })
+
+        expect(window_manager).to have_received(:resize).with(window, nil, nil)
+        expect(window_manager).to have_received(:move).with(window, nil, nil)
+      end
+
       context('raises an error') do
         it('when window with title is not present and command not supplied') do
           expect do

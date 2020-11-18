@@ -23,7 +23,12 @@ module Sapristi
         window = windows[0]
       end
 
-      window = @window_manager.launch command if window.nil? && command
+      if window
+      	puts "Found existing window pid=#{window.pid} title=#{window.title}"
+      	return window
+      end
+
+      window = @window_manager.launch command if command
 
       raise Error, "Couldn't produce a window for this definition" unless window
 
