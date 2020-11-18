@@ -36,21 +36,7 @@ module Sapristi
 
       waiter = execute_and_detach cmd
 
-      start_time = Time.now
-      while Time.now - start_time < timeout_in_seconds && waiter.alive?
-        new_windows_found = @display.windows
-                                    .filter { |w| previous_windows.none? { |old| old.id.eql? w.id } }
-                                    .filter { |w| !previous_pids.include? w.pid }
-
-        new_windows_found.each { |a| puts "  Found new window=#{a.pid}, process=#{waiter.pid}: #{a.title}" }
-        process_window = new_windows_found.find { |window| window.pid.eql? waiter.pid }
-
-        break if process_window
-
-        sleep 0.5
-      end
-
-      raise Error, 'Error executing process, is dead' unless waiter.alive?
+      process_window = detect_window_for_process(waiter, previous_windows, previous_pids, timeout_in_seconds)
 
       if process_window.nil?
         Process.kill 'KILL', waiter.pid
@@ -92,6 +78,29 @@ module Sapristi
       end
       puts "Launch #{cmd.split[0]}, process=#{process_pid}"
       Process.detach process_pid
+    end
+
+    def detect_window_for_process(waiter, previous_windows, previous_pids, timeout_in_seconds)
+      start_time = Time.now
+      while Time.now - start_time < timeout_in_seconds && waiter.alive?
+        process_window = detect_new_windows(previous_windows, previous_pids).find { |w| w.pid.eql? waiter.pid }
+
+        break if process_window
+
+        sleep 0.5
+      end
+
+      raise Error, 'Error executing process, is dead' unless waiter.alive?
+
+      process_window
+    end
+
+    def detect_new_windows(previous_windows, previous_pids)
+      new_windows_found = @display.windows.filter do |w|
+        !previous_pids.include?(w.pid) && previous_windows.none? { |old| old.id.eql? w.id }
+      end
+
+      new_windows_found.each { |w| puts "  Found new window=#{w.pid}: #{w.title}" }
     end
   end
 end

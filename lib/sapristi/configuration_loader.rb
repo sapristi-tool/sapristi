@@ -53,30 +53,33 @@ module Sapristi
     def normalize(definition)
       monitor = @monitor_manager.get_monitor definition['monitor']
 
-      normalized = definition.to_h.keys.each_with_object({}) do |k, memo|
-        is_percentage = definition[k]&.to_s&.match(/^([0-9]{1,2})%$/)
-
-        if is_percentage
-          value = apply_percentage k, definition[k], monitor
-          memo[k] = value[:value]
-          memo[k + NORMALIZED_FIELD_SUFFIX] = value[:raw]
-        else
-          memo[k] = definition[k]
-        end
+      normalized = definition.to_h.keys.each_with_object({}) do |key, memo|
+        normalize_key(key, definition[key], memo, monitor)
       end
 
       NUMERIC_FIELDS.each { |k| normalized[k] = normalized[k].to_i if normalized[k] }
       normalized
     end
 
+    def normalize_key(key, raw, memo, monitor)
+      is_percentage = raw&.to_s&.match(/^([0-9]{1,2})%$/)
+
+      if is_percentage
+        memo[key] = apply_percentage(key, raw, monitor)
+        memo[key + NORMALIZED_FIELD_SUFFIX] = raw
+      else
+        memo[key] = raw
+      end
+    end
+
     def apply_percentage(key, raw, monitor)
       applicable = TRANSLATIONS[key]
       raise "#{key}=#{raw}, using percentage in invalid field, valid=#{TRANSLATIONS.keys.join(', ')}" unless applicable
 
-      m = raw&.to_s&.match(/^([0-9]{1,2})%$/)
-      value = (monitor[TRANSLATIONS[key]] * (m[1].to_i / 100.0)).to_i
+      percentage = raw.to_s.match(/^([0-9]{1,2})%$/)[1].to_i / 100.0
+      monitor_absolute = monitor[TRANSLATIONS[key]]
 
-      { value: value, raw: raw }
+      (monitor_absolute * percentage).to_i
     end
   end
 end
