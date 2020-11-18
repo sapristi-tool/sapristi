@@ -20,6 +20,8 @@ module Sapristi
       table.map { |definition| normalize(definition) }
     rescue Errno::ENOENT
       raise Error, "Configuration file not found: #{file}"
+    rescue StandardError => e
+      raise Error, "Unable to process configuration file: #{file}, error=#{e}"
     end
 
     def valid_headers
