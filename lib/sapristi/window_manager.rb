@@ -47,7 +47,8 @@ module Sapristi
 
       start_time = Time.now
       while Time.now - start_time < timeout_in_seconds && waiter.alive?
-        new_windows_found = @display.windows.filter { |w| !windows_data.include? w.to_h }.filter { |w| !previous_pids.include? w.pid }
+        new_windows_found = @display.windows.filter { |w| !windows_data.include? w.to_h }
+        																		.filter { |w| !previous_pids.include? w.pid }
 
         new_windows_found.each { |a| puts "  Found new window=#{a.pid}, process=#{process_pid}: #{a.title}" }
         process_window = new_windows_found.find { |window| window.pid.eql? process_pid }

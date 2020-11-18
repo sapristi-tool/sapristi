@@ -39,7 +39,10 @@ module Sapristi
 
       CSV.open(conf_file, 'wb', write_headers: true, headers: valid_headers, col_sep: SEPARATOR) do |csv|
         definitions.each do |definition|
-          csv << valid_headers.map { |k| definition.key?(k + NORMALIZED_FIELD_SUFFIX) ? definition[k + NORMALIZED_FIELD_SUFFIX] : definition[k] }
+          csv << valid_headers.map do |k|
+          	raw_key = k + NORMALIZED_FIELD_SUFFIX
+          	definition.key?(raw_key) ? definition[raw_key] : definition[k]
+          end
         end
       end
     end

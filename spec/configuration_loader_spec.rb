@@ -36,15 +36,20 @@ module Sapristi
 
     let(:valid_csv_definitions) do
       [
-        { 'Title' => nil, 'Command' => 'some', 'Monitor' => nil, 'X-position' => 1, 'Y-position' => 2, 'H-size' => 3, 'V-size' => 4, 'Workspace' => 5 },
-        { 'Title' => 'some title', 'Command' => nil, 'Monitor' => 6, 'X-position' => 7, 'Y-position' => 8, 'H-size' => 9, 'V-size' => 10, 'Workspace' => 11 },
-        { 'Title' => 'some title', 'Command' => nil, 'Monitor' => 0, 'X-position' => '10%', 'Y-position' => '20%', 'H-size' => '30%', 'V-size' => '40%', 'Workspace' => 11 }
+        { 'Title' => nil, 'Command' => 'some', 'Monitor' => nil, 'X-position' => 1,
+        	'Y-position' => 2, 'H-size' => 3, 'V-size' => 4, 'Workspace' => 5 },
+        { 'Title' => 'some title', 'Command' => nil, 'Monitor' => 6, 'X-position' => 7,
+        	'Y-position' => 8, 'H-size' => 9, 'V-size' => 10, 'Workspace' => 11 },
+        { 'Title' => 'some title', 'Command' => nil, 'Monitor' => 0, 'X-position' => '10%',
+        	'Y-position' => '20%', 'H-size' => '30%', 'V-size' => '40%', 'Workspace' => 11 }
       ]
     end
 
     context('load') do
       it 'raises an error when configuration file is not found' do
-        expect { under_test.load(non_existing_file) }.to raise_error(Error, /Configuration file not found: #{non_existing_file}/)
+        expect do
+        	under_test.load(non_existing_file)
+        end.to raise_error(Error, /Configuration file not found: #{non_existing_file}/)
       end
 
       it 'raises an error when csv format is invalid' do
@@ -57,7 +62,9 @@ module Sapristi
         file = Tempfile.new('foo')
         file.close
 
-        expect { under_test.create_empty_configuration file.path }.to raise_error Error, /Trying to write empty configuration on existing file #{file.path}/
+        expect do
+        	under_test.create_empty_configuration file.path
+        end.to raise_error Error, /Trying to write empty configuration on existing file #{file.path}/
       ensure
         file.unlink
       end
@@ -66,7 +73,9 @@ module Sapristi
         file = Tempfile.new('foo')
         file.close
 
-        expect { under_test.save file.path, nil }.to raise_error Error, /Trying to write configuration on existing file #{file.path}/
+        expect do
+        	under_test.save file.path, nil
+        end.to raise_error Error, /Trying to write configuration on existing file #{file.path}/
       ensure
         file.unlink
       end
@@ -114,10 +123,13 @@ module Sapristi
         translations = { 'H-size' => 'x', 'V-size' => 'y', 'X-position' => 'x', 'Y-position' => 'y' }
 
         %w[X-position Y-position H-size V-size].each do |field|
-          monitor = { id: 0, name: 'some', main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0 }.transform_keys(&:to_s)
+          monitor = { id: 0, name: 'some',
+          						main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0 }.transform_keys(&:to_s)
           allow_any_instance_of(MonitorManager).to receive(:list_monitors).and_return(xrandr_example)
 
-          expect(content[2][field]).to be ( (valid_csv_definitions[2][field][0..-2].to_i / 100.0) * monitor[translations[field]]).to_i
+
+          expected = ((valid_csv_definitions[2][field][0..-2].to_i / 100.0) * monitor[translations[field]]).to_i
+          expect(content[2][field]).to be expected
         end
       end
     end

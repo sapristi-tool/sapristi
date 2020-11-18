@@ -7,9 +7,14 @@ module Sapristi
     let(:under_test) { MonitorManager.new }
     let(:a_monitor_name) { 'DP-1' }
     let(:another_monitor_name) { 'HDMI-1' }
-    let(:a_monitor) { { id: 0, name: a_monitor_name, main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0 }.transform_keys(&:to_s) }
+    let(:a_monitor) do
+      { id: 0, name: a_monitor_name, main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0 }.transform_keys(&:to_s)
+    end
     let(:main_monitor) { a_monitor }
-    let(:another_monitor) { { id: 1, name: another_monitor_name, main: nil, x: 1920, y: 1080, offset_x: 3840, offset_y: 0 }.transform_keys(&:to_s) }
+    let(:another_monitor) do
+      { id: 1,
+        name: another_monitor_name, main: nil, x: 1920, y: 1080, offset_x: 3840, offset_y: 0 }.transform_keys(&:to_s)
+    end
     let(:xrandr_example) do
       %Q(Monitors: 2
    0: +*#{a_monitor_name} 3840/597x2160/336+0+0  DP-1
