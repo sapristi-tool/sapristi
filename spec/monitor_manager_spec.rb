@@ -4,7 +4,7 @@ require 'spec_helper'
 
 module Sapristi
   RSpec.describe MonitorManager do
-    let(:under_test) { MonitorManager.new }
+    subject { MonitorManager.new }
     let(:a_monitor_name) { 'DP-1' }
     let(:another_monitor_name) { 'HDMI-1' }
     let(:a_monitor) do
@@ -22,28 +22,28 @@ module Sapristi
     end
 
     it 'raises an error if xrandr execution fails' do
-      expect(under_test).to(receive(:list_monitors).and_wrap_original { |_m, *_args| `axrandr --listmonitors` })
+      is_expected.to(receive(:list_monitors).and_wrap_original { |_m, *_args| `axrandr --listmonitors` })
 
-      expect { under_test.get_monitor(nil) }.to raise_error(Error, /Error fetching monitor information/)
+      expect { subject.get_monitor(nil) }.to raise_error(Error, /Error fetching monitor information/)
     end
 
     context 'monitors found' do
-      before(:each) { expect(under_test).to receive(:list_monitors).and_return(xrandr_example) }
+      before(:each) { is_expected.to receive(:list_monitors).and_return(xrandr_example) }
 
       it 'get a monitor' do
-        expect(under_test.get_monitor(a_monitor_name)).to eq(a_monitor)
+        expect(subject.get_monitor(a_monitor_name)).to eq(a_monitor)
       end
 
       it 'get another monitor' do
-        expect(under_test.get_monitor(another_monitor_name)).to eq(another_monitor)
+        expect(subject.get_monitor(another_monitor_name)).to eq(another_monitor)
       end
 
       it 'get main monitor when monitor name not found' do
-        expect(under_test.get_monitor('none')).to eq(main_monitor)
+        expect(subject.get_monitor('none')).to eq(main_monitor)
       end
 
       it 'get main monitor when monitor name is nil' do
-        expect(under_test.get_monitor(nil)).to eq(main_monitor)
+        expect(subject.get_monitor(nil)).to eq(main_monitor)
       end
     end
   end

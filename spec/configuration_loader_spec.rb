@@ -5,7 +5,7 @@ require 'tempfile'
 
 module Sapristi
   RSpec.describe ConfigurationLoader do
-    let(:under_test) { ConfigurationLoader.new }
+    subject { ConfigurationLoader.new }
 
     let(:non_existing_file) do
       '/tmp/non_existent_file_path.csv'
@@ -48,12 +48,12 @@ module Sapristi
     context('load') do
       it 'raises an error when configuration file is not found' do
         expect do
-          under_test.load(non_existing_file)
+          subject.load(non_existing_file)
         end.to raise_error(Error, /Configuration file not found: #{non_existing_file}/)
       end
 
       it 'raises an error when csv format is invalid' do
-        expect { under_test.load(invalid_csv) }.to raise_error(Error, /Invalid configuration file: headers/)
+        expect { subject.load(invalid_csv) }.to raise_error(Error, /Invalid configuration file: headers/)
       end
     end
 
@@ -63,7 +63,7 @@ module Sapristi
         file.close
 
         expect do
-          under_test.create_empty_configuration file.path
+          subject.create_empty_configuration file.path
         end.to raise_error Error, /Trying to write empty configuration on existing file #{file.path}/
       ensure
         file.unlink
@@ -74,7 +74,7 @@ module Sapristi
         file.close
 
         expect do
-          under_test.save file.path, nil
+          subject.save file.path, nil
         end.to raise_error Error, /Trying to write configuration on existing file #{file.path}/
       ensure
         file.unlink
@@ -86,9 +86,9 @@ module Sapristi
         file_path = file.path
         file.unlink
 
-        under_test.save file_path, valid_csv_definitions
+        subject.save file_path, valid_csv_definitions
 
-        expect(under_test.load(file_path)).to eq(valid_csv_definitions.map { |d| under_test.send :normalize, d })
+        expect(subject.load(file_path)).to eq(valid_csv_definitions.map { |d| subject.send :normalize, d })
       end
 
       it 'writes empty configuration' do
@@ -97,14 +97,13 @@ module Sapristi
         file_path = file.path
         file.unlink
 
-        under_test.create_empty_configuration file_path
-
-        expect(File.read(file_path)).to eql under_test.valid_headers.join(ConfigurationLoader::SEPARATOR)
+        subject.create_empty_configuration file_path
+        expect(File.read(file_path)).to eql subject.valid_headers.join(ConfigurationLoader::SEPARATOR)
       end
     end
 
     context 'configuration file' do
-      let(:content) { under_test.load(valid_csv) }
+      let(:content) { subject.load(valid_csv) }
 
       let(:xrandr_example) do
         %(Monitors: 2

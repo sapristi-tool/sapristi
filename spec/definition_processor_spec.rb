@@ -37,7 +37,7 @@ module Sapristi
     context 'manipulate window' do
       let(:window) { double('window') }
       let(:window_manager) { spy('window_manager') }
-      let(:under_test) do
+      subject do
         manager = DefinitionProcessor.new(window_manager)
         allow(manager).to receive(:get_window).and_return(window)
 
@@ -54,13 +54,13 @@ module Sapristi
       end
 
       it 'move window' do
-        under_test.process_definition(definition)
+        subject.process_definition(definition)
 
         expect(window_manager).to have_received(:move).with(window, x_position, y_position)
       end
 
       it 'move window' do
-        under_test.process_definition(definition)
+        subject.process_definition(definition)
 
         expect(window_manager).to have_received(:resize).with(window, size_x, size_y)
       end
