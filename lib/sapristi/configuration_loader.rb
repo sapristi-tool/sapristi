@@ -11,11 +11,7 @@ module Sapristi
 
     def load(file)
       table = CSV.read(file, headers: true, col_sep: SEPARATOR)
-      unless table.headers.eql? valid_headers
-        actual_headers = table.headers.join(', ')
-        expected_headers = valid_headers.join(', ')
-        raise Error, "Invalid configuration file: headers=#{actual_headers}, valid=#{expected_headers}"
-      end
+      validate_headers(table)
 
       table.map { |definition| normalize(definition) }
     rescue Errno::ENOENT
@@ -48,6 +44,14 @@ module Sapristi
     end
 
     private
+
+    def validate_headers(table)
+      return if table.headers.eql? valid_headers
+
+      actual_headers = table.headers.join(', ')
+      expected_headers = valid_headers.join(', ')
+      raise Error, "Invalid configuration file: headers=#{actual_headers}, valid=#{expected_headers}"
+    end
 
     NORMALIZED_FIELD_SUFFIX = '_raw'
     TRANSLATIONS = { 'H-size' => 'x', 'V-size' => 'y', 'X-position' => 'x', 'Y-position' => 'y' }.freeze
