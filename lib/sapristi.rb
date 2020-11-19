@@ -6,7 +6,19 @@ require 'sapristi/configuration_loader'
 require 'sapristi/window_manager'
 require 'sapristi/definition_processor'
 require 'sapristi/sapristi'
+require 'logger'
 
 module Sapristi
   class Error < StandardError; end
+
+  class << self
+    attr_writer :logger
+
+    def logger
+      @logger ||= Logger.new($stdout).tap do |log|
+        log.progname = name
+        log.level = Logger::WARN
+      end
+    end
+  end
 end

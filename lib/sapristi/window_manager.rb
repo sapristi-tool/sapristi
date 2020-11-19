@@ -44,7 +44,7 @@ module Sapristi
         raise Error, "Error executing process, it didn't open a window"
       end
 
-      puts "Found window title=#{process_window.title} for process=#{waiter.pid}!"
+      ::Sapristi.logger.info "Found window title=#{process_window.title} for process=#{waiter.pid}!"
       process_window
     end
 
@@ -76,7 +76,7 @@ module Sapristi
       rescue StandardError
         (raise Error, "Error executing process: #{$ERROR_INFO}")
       end
-      puts "Launch #{cmd.split[0]}, process=#{process_pid}"
+      ::Sapristi.logger.info "Launch #{cmd.split[0]}, process=#{process_pid}"
       Process.detach process_pid
     end
 
@@ -100,7 +100,7 @@ module Sapristi
         !previous_pids.include?(w.pid) && previous_windows.none? { |old| old.id.eql? w.id }
       end
 
-      new_windows_found.each { |w| puts "  Found new window=#{w.pid}: #{w.title}" }
+      new_windows_found.each { |w| ::Sapristi.logger.debug "  Found new window=#{w.pid}: #{w.title}" }
     end
   end
 end

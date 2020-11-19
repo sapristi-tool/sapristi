@@ -16,23 +16,19 @@ module Sapristi
     private
 
     def get_window(title, command)
-      if title
-        windows = @window_manager.find_window(/#{title}/)
-        raise Error, "#{windows.size} windows have the same title: #{title}" if windows.size > 1
+      title && find_one_by_title(title) ||
+        command && @window_manager.launch(command) ||
+        raise(Error, "Couldn't produce a window for this definition")
+    end
 
-        window = windows[0]
+    def find_one_by_title(title)
+      windows = @window_manager.find_window(/#{title}/)
+      raise Error, "#{windows.size} windows have the same title: #{title}" if windows.size > 1
+
+      if windows.size.eql? 1
+        ::Sapristi.logger.info "Found existing window pid=#{windows[0].pid} title=#{windows[0].title}"
       end
-
-      if window
-        puts "Found existing window pid=#{window.pid} title=#{window.title}"
-        return window
-      end
-
-      window = @window_manager.launch command if command
-
-      raise Error, "Couldn't produce a window for this definition" unless window
-
-      window
+      windows[0]
     end
   end
 end

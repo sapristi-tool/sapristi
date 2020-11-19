@@ -3,12 +3,15 @@
 module Sapristi
   class MonitorManager
     def get_monitor(name)
-      available_monitors = monitors
+      available = monitors
 
-      return available_monitors[name] if available_monitors[name]
+      return available[name] if available[name]
 
-      main = available_monitors.values.find { |m| m['main'] }
-      puts "Monitor #{name} not found. Using #{main['name']}, available=#{available_monitors.keys.join(', ')}" if name
+      main = available.values.find { |m| m['main'] }
+      if name
+        aval_names = available.keys.join(', ')
+        ::Sapristi.logger.warn "Monitor #{name} not found. Using #{main['name']}, available=#{aval_names}"
+      end
       main
     end
 

@@ -8,7 +8,7 @@ module Sapristi
     end
 
     def run(conf_file = user_default_configuration_file)
-      puts "Sapristi: Processing: #{conf_file}"
+      ::Sapristi.logger.info "Sapristi: Processing: #{conf_file}"
       if conf_file.eql?(user_default_configuration_file) && !File.exist?(conf_file)
         @configuration_loader.create_empty_configuration conf_file
       end
