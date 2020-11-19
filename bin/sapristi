@@ -4,4 +4,17 @@
 require 'bundler/setup'
 require 'sapristi'
 
-Sapristi::Sapristi.new.run
+def run_sapristi args
+  options = Sapristi::ArgumentsParser.new.parse args
+
+  sapristi = Sapristi::Sapristi.new
+  sapristi.verbose! if options.verbose
+  sapristi.dry! if options.dry
+
+  options.file ? sapristi.run(options.file) : sapristi.run
+end
+
+if $0 == __FILE__
+  
+  run_sapristi(ARGV)
+end

@@ -15,7 +15,12 @@ module Sapristi
   def self.logger
     @logger ||= Logger.new($stdout).tap do |log|
       log.progname = name
-      log.level = Logger::INFO
+      log.level = Logger::WARN
+
+      log.formatter = proc do |severity, datetime, progname, msg|
+         "#{msg}\n"
+      end
+
     end
   end
 end

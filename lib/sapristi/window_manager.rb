@@ -44,7 +44,7 @@ module Sapristi
         raise Error, "Error executing process, it didn't open a window"
       end
 
-      ::Sapristi.logger.info "Found window title=#{process_window.title} for process=#{waiter.pid}!"
+      ::Sapristi.logger.info "  Found window title=#{process_window.title} for process=#{waiter.pid}!"
       process_window
     end
 
