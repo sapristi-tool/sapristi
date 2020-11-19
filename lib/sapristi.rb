@@ -6,6 +6,7 @@ require 'sapristi/configuration_loader'
 require 'sapristi/window_manager'
 require 'sapristi/definition_processor'
 require 'sapristi/sapristi'
+require 'sapristi/arguments_parser'
 require 'logger'
 
 module Sapristi
