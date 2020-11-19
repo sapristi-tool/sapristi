@@ -54,52 +54,52 @@ module Sapristi
     end
 
     context('#find_window') do
-	    it 'one window by title' do
-	      window = subject.launch('gedit --new-window deleteme_title.txt')
+      it 'one window by title' do
+        window = subject.launch('gedit --new-window deleteme_title.txt')
 
-	      actual_windows = subject.find_window(/deleteme_title.txt/)
-	                                 .map(&:to_h)
-	                                 .map { |w| w.reject { |k| k.eql? :active } }
-	      expect(actual_windows).to eq([window.to_h.reject { |k| k.eql? :active }])
-	    ensure
-	      subject.close(window) if window
-	    end
+        actual_windows = subject.find_window(/deleteme_title.txt/)
+                                .map(&:to_h)
+                                .map { |w| w.reject { |k| k.eql? :active } }
+        expect(actual_windows).to eq([window.to_h.reject { |k| k.eql? :active }])
+      ensure
+        subject.close(window) if window
+      end
 
-	    it 'two windows by title' do
-	      window1 = subject.launch('gedit --new-window deleteme_title.txt')
-	      window2 = subject.launch('sol')
+      it 'two windows by title' do
+        window1 = subject.launch('gedit --new-window deleteme_title.txt')
+        window2 = subject.launch('sol')
 
-	      actual_windows = subject.find_window(/deleteme_title.txt|Klondike/).map(&:to_h)
-	      expect(actual_windows.to_a).to have(2).items
-	    ensure
-	      subject.close(window1) if window1
-	      subject.close(window2) if window2
-	    end
+        actual_windows = subject.find_window(/deleteme_title.txt|Klondike/).map(&:to_h)
+        expect(actual_windows.to_a).to have(2).items
+      ensure
+        subject.close(window1) if window1
+        subject.close(window2) if window2
+      end
 
-	    it 'empty list when window not found' do
-	      actual_windows = subject.find_window(/no window title/).map(&:to_h)
-	      expect(actual_windows.to_a).to have(0).items
-	    end
-	  end
+      it 'empty list when window not found' do
+        actual_windows = subject.find_window(/no window title/).map(&:to_h)
+        expect(actual_windows.to_a).to have(0).items
+      end
+    end
 
     context('#launch') do
-    	context('raises an error') do
-	      it('when command is invalid') do
-	        expect { subject.launch('invalid_command') }
-	          .to raise_error(Error, /Error executing process: No such file or directory/)
-	      end
+      context('raises an error') do
+        it('when command is invalid') do
+          expect { subject.launch('invalid_command') }
+            .to raise_error(Error, /Error executing process: No such file or directory/)
+        end
 
-	      it('when command ends') do
-	        expect { subject.launch('/bin/ls > /dev/null') }
-	          .to raise_error(Error, /Error executing process, is dead/)
-	      end
+        it('when command ends') do
+          expect { subject.launch('/bin/ls > /dev/null') }
+            .to raise_error(Error, /Error executing process, is dead/)
+        end
 
-	      it('when command does not create a window') do
-	      	non_dying_command = 'bash -c "read"'
-	        expect { subject.launch(non_dying_command, 1) }
-	          .to raise_error(Error, /Error executing process, it didn't open a window/)
-	      end
-    	end
+        it('when command does not create a window') do
+          non_dying_command = 'bash -c "read"'
+          expect { subject.launch(non_dying_command, 1) }
+            .to raise_error(Error, /Error executing process, it didn't open a window/)
+        end
+      end
 
       it('launches a new gedit window and process') do
         user_id = `id -u`.strip

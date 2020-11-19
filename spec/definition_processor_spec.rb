@@ -18,7 +18,7 @@ module Sapristi
 
       it('uses window when found by title') do
         window_manager = spy('window_manager')
-        window = double('window', pid: 1, title: "title")
+        window = double('window', pid: 1, title: 'title')
         allow(window_manager).to receive(:find_window).with(/Klondike/).and_return([window])
 
         DefinitionProcessor.new(window_manager).process_definition({ 'Title' => 'Klondike', 'Command' => command })

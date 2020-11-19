@@ -25,7 +25,7 @@ module Sapristi
       is_expected.to(receive(:list_monitors).and_wrap_original { |_m, *_args| `axrandr --listmonitors` })
 
       expect { subject.get_monitor(nil) }.to raise_error(Error, /Error fetching monitor information/)
-    end      
+    end
 
     context('#get_monitor') do
       before(:each) { is_expected.to receive(:list_monitors).and_return(xrandr_example) }

@@ -24,8 +24,8 @@ module Sapristi
       end
 
       if window
-      	puts "Found existing window pid=#{window.pid} title=#{window.title}"
-      	return window
+        puts "Found existing window pid=#{window.pid} title=#{window.title}"
+        return window
       end
 
       window = @window_manager.launch command if command

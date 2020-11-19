@@ -46,44 +46,43 @@ module Sapristi
     end
 
     context('#load') do
-    	context('raises an error') do
-	      it 'when configuration file is not found' do
-	        expect do
-	          subject.load(non_existing_file)
-	        end.to raise_error(Error, /Configuration file not found: #{non_existing_file}/)
-	      end
+      context('raises an error') do
+        it 'when configuration file is not found' do
+          expect do
+            subject.load(non_existing_file)
+          end.to raise_error(Error, /Configuration file not found: #{non_existing_file}/)
+        end
 
-	      it 'when csv format is invalid' do
-	        expect { subject.load(invalid_csv) }.to raise_error(Error, /Invalid configuration file: headers/)
-	      end
-	    end
+        it 'when csv format is invalid' do
+          expect { subject.load(invalid_csv) }.to raise_error(Error, /Invalid configuration file: headers/)
+        end
+      end
     end
 
     context('#save') do
-    	context('raises and error') do
-    		it 'when creating an empty configuration on an existing file' do
-	        file = Tempfile.new('foo')
-	        file.close
+      context('raises and error') do
+        it 'when creating an empty configuration on an existing file' do
+          file = Tempfile.new('foo')
+          file.close
 
-	        expect do
-	          subject.create_empty_configuration file.path
-	        end.to raise_error Error, /Trying to write empty configuration on existing file #{file.path}/
-	      ensure
-	        file.unlink
-	      end
+          expect do
+            subject.create_empty_configuration file.path
+          end.to raise_error Error, /Trying to write empty configuration on existing file #{file.path}/
+        ensure
+          file.unlink
+        end
 
-	      it 'when saving configuration on an existing file' do
-	        file = Tempfile.new('foo')
-	        file.close
+        it 'when saving configuration on an existing file' do
+          file = Tempfile.new('foo')
+          file.close
 
-	        expect do
-	          subject.save file.path, nil
-	        end.to raise_error Error, /Trying to write configuration on existing file #{file.path}/
-	      ensure
-	        file.unlink
-	      end
-    	end
-     
+          expect do
+            subject.save file.path, nil
+          end.to raise_error Error, /Trying to write configuration on existing file #{file.path}/
+        ensure
+          file.unlink
+        end
+      end
 
       it 'saves definitions' do
         file = Tempfile.new('foo')
