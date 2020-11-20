@@ -6,3 +6,6 @@ Style/Documentation:
 
 Metrics/BlockLength:
   ExcludedMethods: ['describe', 'context']
+
+Style/StderrPuts:
+  Enabled: false
