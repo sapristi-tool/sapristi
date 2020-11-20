@@ -74,7 +74,7 @@ module Sapristi
       process_pid = begin
         Process.spawn(cmd)
       rescue StandardError
-        (raise Error, "Error executing process: #{$ERROR_INFO}")
+        raise Error, "Error executing process: #{$ERROR_INFO}"
       end
       ::Sapristi.logger.info "Launch #{cmd.split[0]}, process=#{process_pid}"
       Process.detach process_pid

@@ -11,13 +11,17 @@ module Sapristi
 
     def load(file)
       table = CSV.read(file, headers: true, col_sep: SEPARATOR)
+      raise Error, 'Empty file' if table.eql? []
+
       validate_headers(table)
 
       table.map { |definition| normalize(definition) }
     rescue Errno::ENOENT
       raise Error, "Configuration file not found: #{file}"
+    rescue Error => e
+      raise Error, "Invalid configuration file: #{e.message}"
     rescue StandardError => e
-      raise Error, "Unable to process configuration file: #{file}, error=#{e}"
+      raise Error, "Unable to process configuration file: #{file}, error=#{e.message}"
     end
 
     def valid_headers
@@ -50,7 +54,7 @@ module Sapristi
 
       actual_headers = table.headers.join(', ')
       expected_headers = valid_headers.join(', ')
-      raise Error, "Invalid configuration file: headers=#{actual_headers}, valid=#{expected_headers}"
+      raise Error, "invalid headers=#{actual_headers}, valid=#{expected_headers}"
     end
 
     NORMALIZED_FIELD_SUFFIX = '_raw'

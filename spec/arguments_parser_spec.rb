@@ -8,8 +8,8 @@ module Sapristi
     subject { ArgumentsParser.new }
 
     it 'can enable verbose mode' do
-      expect(subject.parse(["-v"]).verbose).to be_truthy
-       expect(subject.parse(["--verbose"]).verbose).to be_truthy
+      expect(subject.parse(['-v']).verbose).to be_truthy
+      expect(subject.parse(['--verbose']).verbose).to be_truthy
     end
 
     it 'verbose mode disabled by default' do
@@ -17,13 +17,13 @@ module Sapristi
     end
 
     it 'reads configuration file from option' do
-      expected_file = "/tmp/foo"
-      expect(subject.parse(["-f", expected_file]).file).to eq(expected_file)
-      expect(subject.parse(["--file", expected_file]).file).to eq(expected_file)
+      expected_file = '/tmp/foo'
+      expect(subject.parse(['-f', expected_file]).file).to eq(expected_file)
+      expect(subject.parse(['--file', expected_file]).file).to eq(expected_file)
     end
 
     it 'reads dry run' do
-      expect(subject.parse(["--dry-run"]).dry).to be_truthy
+      expect(subject.parse(['--dry-run']).dry).to be_truthy
     end
   end
 end

@@ -16,6 +16,8 @@ module Sapristi
       @configuration_loader.load(conf_file).each_with_index do |definition, index|
         ::Sapristi.logger.info "Process line #{index}: #{definition.inspect}"
         @definition_processor.process_definition(definition) unless @dry
+      rescue Error => e
+        raise Error, "#{e.message}, line=#{index}"
       end
     end
 
@@ -25,9 +27,7 @@ module Sapristi
 
     def dry!
       @dry = true
-      if ::Sapristi.logger.level > Logger::INFO
-        ::Sapristi.logger.level = :info
-      end
+      ::Sapristi.logger.level = :info if ::Sapristi.logger.level > Logger::INFO
     end
 
     private

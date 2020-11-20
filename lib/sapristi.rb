@@ -17,10 +17,9 @@ module Sapristi
       log.progname = name
       log.level = Logger::WARN
 
-      log.formatter = proc do |severity, datetime, progname, msg|
-         "#{msg}\n"
+      log.formatter = proc do |_severity, _datetime, _progname, msg|
+        "#{msg}\n"
       end
-
     end
   end
 end

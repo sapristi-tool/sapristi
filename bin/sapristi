@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'sapristi'
 
-def run_sapristi args
+def run_sapristi(args)
   options = Sapristi::ArgumentsParser.new.parse args
 
   sapristi = Sapristi::Sapristi.new
@@ -12,9 +12,22 @@ def run_sapristi args
   sapristi.dry! if options.dry
 
   options.file ? sapristi.run(options.file) : sapristi.run
+rescue Sapristi::Error => e
+  $stderr.puts e.message
+  exit 1
+rescue StandardError => e
+  error_file = save_stacktrace e
+  $stderr.puts "Sapristi crashed, see #{error_file}"
+  exit 2
 end
 
-if $0 == __FILE__
-  
-  run_sapristi(ARGV)
+def save_stacktrace(error)
+  file = File.join '/tmp', "sapristi.stacktrace#{Time.new.to_i}.log"
+  File.open(file, 'w') do |f|
+    f.write "#{error.class}: #{error.message}\n\n"
+    f.write error.backtrace.join("\n")
+  end
+  file
 end
+
+run_sapristi(ARGV) if $PROGRAM_NAME == __FILE__

@@ -53,8 +53,15 @@ module Sapristi
           end.to raise_error(Error, /Configuration file not found: #{non_existing_file}/)
         end
 
+        it 'when csv is empty' do
+          empty_file = Tempfile.create('foo')
+          empty_file.close
+
+          expect { subject.load(empty_file) }.to raise_error(Error, /Invalid configuration file: Empty file/)
+        end
+
         it 'when csv format is invalid' do
-          expect { subject.load(invalid_csv) }.to raise_error(Error, /Invalid configuration file: headers/)
+          expect { subject.load(invalid_csv) }.to raise_error(Error, /Invalid configuration file: invalid headers/)
         end
       end
     end

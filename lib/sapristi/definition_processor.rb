@@ -18,7 +18,7 @@ module Sapristi
     def get_window(title, command)
       (title && find_one_by_title(title)) ||
         (command && @window_manager.launch(command)) ||
-        (raise(Error, "Couldn't produce a window for this definition"))
+        raise(Error, "Couldn't produce a window for this definition")
     end
 
     def find_one_by_title(title)
