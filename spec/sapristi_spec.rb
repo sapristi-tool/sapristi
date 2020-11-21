@@ -34,7 +34,7 @@ module Sapristi
 
     it 'process lines in configuration file' do
       definition = { 'Title' => nil, 'Command' => 'sol', 'Monitor' => nil,
-                     'X-position' => 0, 'Y-position' => 0, 'H-size' => 500, 'V-size' => 500, 'Workspace' => nil }
+                     'X-position' => 0, 'Y-position' => 0, 'H-size' => 500, 'V-size' => 500, 'Workspace' => 0 }
 
       file = Tempfile.create 'foo'
       file_path = file.path

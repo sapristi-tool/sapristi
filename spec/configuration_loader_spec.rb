@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'tempfile'
+require 'ostruct'
 
 module Sapristi
   RSpec.describe ConfigurationLoader do
@@ -37,11 +38,11 @@ module Sapristi
     let(:valid_csv_definitions) do
       [
         { 'Title' => nil, 'Command' => 'some', 'Monitor' => nil, 'X-position' => 1,
-          'Y-position' => 2, 'H-size' => 3, 'V-size' => 4, 'Workspace' => 5 },
+          'Y-position' => 2, 'H-size' => 300, 'V-size' => 400, 'Workspace' => 0 },
         { 'Title' => 'some title', 'Command' => nil, 'Monitor' => 6, 'X-position' => 7,
-          'Y-position' => 8, 'H-size' => 9, 'V-size' => 10, 'Workspace' => 11 },
+          'Y-position' => 8, 'H-size' => 900, 'V-size' => 100, 'Workspace' => 0 },
         { 'Title' => 'some title', 'Command' => nil, 'Monitor' => 0, 'X-position' => '10%',
-          'Y-position' => '20%', 'H-size' => '30%', 'V-size' => '40%', 'Workspace' => 11 }
+          'Y-position' => '20%', 'H-size' => '30%', 'V-size' => '40%', 'Workspace' => nil }
       ]
     end
 
@@ -62,6 +63,133 @@ module Sapristi
 
         it 'when csv format is invalid' do
           expect { subject.load(invalid_csv) }.to raise_error(Error, /Invalid configuration file: invalid headers/)
+        end
+
+        context('error in lines') do
+          def create_valid_file_one_line(values)
+            file = '/tmp/mock_conf.csv'
+            File.delete file if File.exist? file
+
+            definition = valid_csv_definitions[0].merge(values)
+            subject.save(file, [definition])
+            file
+          end
+
+          let(:monitor_width) { 1024 }
+          let(:monitor_height) { 480 }
+          let(:xrandr_example) do
+            %(Monitors: 2
+   0: +*monitor1 #{monitor_width}/597x#{monitor_height}/336+0+0  DP-1
+   1: +monitor2 1920/509x1080/286+3840+0  HDMI-1)
+          end
+
+          before(:each) do
+            allow_any_instance_of(MonitorManager).to receive(:list_monitors).and_return(xrandr_example)
+            allow_any_instance_of(WindowManager).to receive(:workspaces).and_return([OpenStruct.new(current: nil, id: 0), OpenStruct.new(current: true, id: 1), OpenStruct.new(current: nil, id: 2)])
+          end
+
+          it 'when no window and no command specified' do
+            file = create_valid_file_one_line('Command' => nil, 'Title' => nil)
+            expect { subject.load file }.to raise_error(Error, /No command or window title specified/)
+          end
+
+          it 'when any of the geometry values is not defined' do
+            %w[H-size V-size X-position Y-position].each do |key|
+              file = create_valid_file_one_line(key => nil)
+              expect { subject.load file }.to raise_error(Error, /No #{key} specified/)
+            end
+          end
+
+          it 'when fixed x > monitor width' do
+            file = create_valid_file_one_line('X-position' => monitor_width)
+
+            expect { subject.load file }.to raise_error(Error, /x=#{monitor_width} is outside of monitor width dimension=0..#{monitor_width - 1}/)
+          end
+
+          it 'when fixed y > monitor length' do
+            file = create_valid_file_one_line('Y-position' => monitor_height)
+
+            expect { subject.load file }.to raise_error(Error, /y=#{monitor_height} is outside of monitor height dimension=0..#{monitor_height - 1}/)
+          end
+
+          it 'when fixed x < 0' do
+            x = -1
+            file = create_valid_file_one_line('X-position' => x)
+
+            expect { subject.load file }.to raise_error(Error, /x=#{x} is outside of monitor width dimension=0..#{monitor_width - 1}/)
+          end
+
+          it 'when fixed y < 0' do
+            y = -1
+            file = create_valid_file_one_line('Y-position' => y)
+
+            expect { subject.load file }.to raise_error(Error, /y=#{y} is outside of monitor height dimension=0..#{monitor_height - 1}/)
+          end
+
+          it 'when x + width > monitor width' do
+            x = monitor_width / 2
+            x_size = 1 + monitor_width / 2
+            file = create_valid_file_one_line('X-position' => x, 'H-size' => x_size)
+
+            expect { subject.load file }.to raise_error(Error, /window x dimensions: \[#{x}, #{x + x_size}\] exceeds monitor width \[0..#{monitor_width - 1}\]/)
+          end
+
+          it 'when y + length > monitor length' do
+            y = monitor_height / 2
+            y_size = 1 + monitor_height / 2
+            file = create_valid_file_one_line('Y-position' => y, 'V-size' => y_size)
+
+            expect { subject.load file }.to raise_error(Error, /window y dimensions: \[#{y}, #{y + y_size}\] exceeds monitor height \[0..#{monitor_height - 1}\]/)
+          end
+
+          it 'when witdh < 50' do
+            file = create_valid_file_one_line('H-size' => 49)
+            expect { subject.load file }.to raise_error(Error, /window x size=49 less than 50/)
+          end
+
+          it 'when length < 50' do
+            file = create_valid_file_one_line('V-size' => 49)
+            expect { subject.load file }.to raise_error(Error, /window y size=49 less than 50/)
+          end
+
+          context('percentages') do
+            it 'when percentage x < 0 or > 100' do
+            end
+
+            it 'when percentage y < 0 or > 100' do
+            end
+
+            it 'when percentage witdh < 0 or > 100' do
+            end
+
+            it 'when percentage length < 0 or > 100' do
+            end
+          end
+
+          it 'when no command and no title specified' do
+          end
+
+          it 'when monitor < 0' do
+          end
+
+          it 'when workspace < 0' do
+            last_workspace_id = WindowManager.new.workspaces.size - 1
+            file = create_valid_file_one_line('Workspace' => -1)
+            expect { subject.load file }.to raise_error(Error, /invalid workspace=-1 valid=0..#{last_workspace_id}/)
+          end
+
+          it 'when workspace id > last workspace id' do
+            last_workspace_id = WindowManager.new.workspaces.size - 1
+
+            file = create_valid_file_one_line('Workspace' => last_workspace_id + 1)
+            expect { subject.load file }.to raise_error(Error, /invalid workspace=#{last_workspace_id + 1} valid=0..#{last_workspace_id}/)
+          end
+
+          it 'when workspace is not specified use current' do
+            current_workspace_id = WindowManager.new.workspaces.find(&:current).id
+            file = create_valid_file_one_line('Workspace' => nil)
+            expect(subject.load(file)[0]['Workspace']).to eq(current_workspace_id)
+          end
         end
       end
     end

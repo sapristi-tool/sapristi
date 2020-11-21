@@ -13,7 +13,9 @@ module Sapristi
         @configuration_loader.create_empty_configuration conf_file
       end
 
-      @configuration_loader.load(conf_file).each_with_index do |definition, index|
+      definitions = @configuration_loader.load(conf_file)
+
+      definitions.each_with_index do |definition, index|
         ::Sapristi.logger.info "Process line #{index}: #{definition.inspect}"
         @definition_processor.process_definition(definition) unless @dry
       rescue Error => e

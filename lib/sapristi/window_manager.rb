@@ -63,6 +63,10 @@ module Sapristi
       @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
     end
 
+    def workspaces
+      @display.desktops
+    end
+
     private
 
     def user_pids
