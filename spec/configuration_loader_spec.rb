@@ -153,23 +153,34 @@ module Sapristi
           end
 
           context('percentages') do
-            it 'when percentage x < 0 or > 100' do
+            RSpec.shared_examples 'geometry percentage' do |field|
+              it "when #{field} percentage x < 5" do
+                raw = '4%'
+                file = create_valid_file_one_line(field => raw)
+                expect { subject.load file }.to raise_error(Error, /#{field} percentage is invalid=#{raw}, valid=5%-100%/)
+              end
+
+              it "when #{field} percentage x > 100" do
+                raw = '101%'
+                file = create_valid_file_one_line(field => raw)
+                expect { subject.load file }.to raise_error(Error, /#{field} percentage is invalid=#{raw}, valid=5%-100%/)
+              end
             end
 
-            it 'when percentage y < 0 or > 100' do
-            end
-
-            it 'when percentage witdh < 0 or > 100' do
-            end
-
-            it 'when percentage length < 0 or > 100' do
-            end
+            include_examples 'geometry percentage', 'X-position'
+            include_examples 'geometry percentage', 'Y-position'
+            include_examples 'geometry percentage', 'H-size'
+            include_examples 'geometry percentage', 'V-size'
           end
 
           it 'when no command and no title specified' do
+            file = create_valid_file_one_line('Command' => nil, 'Title' => nil)
+            expect { subject.load file }.to raise_error(Error, /No command or window title specified/)
           end
 
           it 'when monitor < 0' do
+            file = create_valid_file_one_line('Monitor' => -1)
+            expect { subject.load file }.to raise_error(Error, /Invalid monitor=-1/)
           end
 
           it 'when workspace < 0' do

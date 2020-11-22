@@ -75,7 +75,9 @@ module Sapristi
       geometry_field_nil = %w[H-size V-size X-position Y-position].find { |key| definition[key].nil? }
       raise Error, "No #{geometry_field_nil} specified" if geometry_field_nil
 
-      monitor = @monitor_manager.get_monitor definition['monitor']
+      raise Error, 'Invalid monitor=-1' if definition['Monitor'] && definition['Monitor'].to_i < 0
+
+      monitor = @monitor_manager.get_monitor definition['Monitor']
 
       normalized = definition.to_h.keys.each_with_object({}) do |key, memo|
         normalize_key(key, definition[key], memo, monitor)
@@ -120,11 +122,13 @@ module Sapristi
     end
 
     def normalize_key(key, raw, memo, monitor)
-      is_percentage = raw&.to_s&.match(/^([0-9]{1,2})%$/)
+      is_percentage = raw&.to_s&.match(/^([0-9]+)%$/)
 
       if is_percentage
         memo[key] = apply_percentage(key, raw, monitor)
         memo[key + NORMALIZED_FIELD_SUFFIX] = raw
+      elsif raw.to_s.include?('%')
+        raise Error, "key=#{key}, invalid percentage=#{raw}"
       else
         memo[key] = raw
       end
@@ -134,7 +138,10 @@ module Sapristi
       applicable = TRANSLATIONS[key]
       raise "#{key}=#{raw}, using percentage in invalid field, valid=#{TRANSLATIONS.keys.join(', ')}" unless applicable
 
-      percentage = raw.to_s.match(/^([0-9]{1,2})%$/)[1].to_i / 100.0
+      value = raw.to_s.match(/^([0-9]+)%$/)[1].to_i
+      raise Error, "#{key} percentage is invalid=#{raw}, valid=5%-100%" if value < 5 || value > 100
+
+      percentage = value / 100.0
       monitor_absolute = monitor[TRANSLATIONS[key]]
 
       (monitor_absolute * percentage).to_i
