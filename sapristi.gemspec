@@ -46,6 +46,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.10'
   spec.add_development_dependency 'rspec-collection_matchers', '~> 1.2.0'
   spec.add_development_dependency 'rubocop', '~> 1.3.1'
+  spec.add_development_dependency 'simplecov', '~> 0.19.0'
 
   spec.add_runtime_dependency 'ruby-wmctrl', '~> 0.0.8'
 end
