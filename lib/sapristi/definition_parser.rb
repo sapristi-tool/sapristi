@@ -31,7 +31,6 @@ module Sapristi
       NUMERIC_FIELDS.each { |k| normalized[k] = normalized[k].to_i if normalized[k] }
       normalized['Workspace'] ||= @window_manager.workspaces.find(&:current).id
 
-      
       normalized
     end
 
