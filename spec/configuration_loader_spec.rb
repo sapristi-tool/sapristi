@@ -261,7 +261,7 @@ module Sapristi
 
         subject.save file_path, valid_csv_definitions
 
-        expect(subject.load(file_path)).to eq(valid_csv_definitions.map { |d| subject.send :normalize, d })
+        expect(subject.load(file_path)).to eq(valid_csv_definitions.map { |d| DefinitionParser.new.parse d })
       end
 
       it 'writes empty configuration' do
