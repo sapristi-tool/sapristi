@@ -83,9 +83,17 @@ module Sapristi
    1: +monitor2 1920/509x1080/286+3840+0  HDMI-1)
           end
 
+          let(:some_monitors) do
+            [
+              OpenStruct.new(current: nil, id: 0),
+              OpenStruct.new(current: true, id: 1),
+              OpenStruct.new(current: nil, id: 2)
+            ]
+          end
+
           before(:each) do
             allow_any_instance_of(MonitorManager).to receive(:list_monitors).and_return(xrandr_example)
-            allow_any_instance_of(WindowManager).to receive(:workspaces).and_return([OpenStruct.new(current: nil, id: 0), OpenStruct.new(current: true, id: 1), OpenStruct.new(current: nil, id: 2)])
+            allow_any_instance_of(WindowManager).to receive(:workspaces).and_return(some_monitors)
           end
 
           it 'when no window and no command specified' do
@@ -103,27 +111,33 @@ module Sapristi
           it 'when fixed x > monitor width' do
             file = create_valid_file_one_line('X-position' => monitor_width)
 
-            expect { subject.load file }.to raise_error(Error, /x=#{monitor_width} is outside of monitor width dimension=0..#{monitor_width - 1}/)
+            valid = "0..#{monitor_width - 1}"
+            expect { subject.load file }
+              .to raise_error(Error, /x=#{monitor_width} is outside of monitor width dimension=#{valid}/)
           end
 
           it 'when fixed y > monitor length' do
             file = create_valid_file_one_line('Y-position' => monitor_height)
 
-            expect { subject.load file }.to raise_error(Error, /y=#{monitor_height} is outside of monitor height dimension=0..#{monitor_height - 1}/)
+            valid = "0..#{monitor_height - 1}"
+            expect { subject.load file }
+              .to raise_error(Error, /y=#{monitor_height} is outside of monitor height dimension=#{valid}/)
           end
 
           it 'when fixed x < 0' do
             x = -1
             file = create_valid_file_one_line('X-position' => x)
 
-            expect { subject.load file }.to raise_error(Error, /x=#{x} is outside of monitor width dimension=0..#{monitor_width - 1}/)
+            expect { subject.load file }
+              .to raise_error(Error, /x=#{x} is outside of monitor width dimension=0..#{monitor_width - 1}/)
           end
 
           it 'when fixed y < 0' do
             y = -1
             file = create_valid_file_one_line('Y-position' => y)
 
-            expect { subject.load file }.to raise_error(Error, /y=#{y} is outside of monitor height dimension=0..#{monitor_height - 1}/)
+            expect { subject.load file }
+              .to raise_error(Error, /y=#{y} is outside of monitor height dimension=0..#{monitor_height - 1}/)
           end
 
           it 'when x + width > monitor width' do
@@ -131,7 +145,10 @@ module Sapristi
             x_size = 1 + monitor_width / 2
             file = create_valid_file_one_line('X-position' => x, 'H-size' => x_size)
 
-            expect { subject.load file }.to raise_error(Error, /window x dimensions: \[#{x}, #{x + x_size}\] exceeds monitor width \[0..#{monitor_width - 1}\]/)
+            dimensions = "\\[#{x}, #{x + x_size}\\]"
+            valid = "\\[0..#{monitor_width - 1}\\]"
+            expect { subject.load file }
+              .to raise_error(Error, /window x dimensions: #{dimensions} exceeds monitor width #{valid}/)
           end
 
           it 'when y + length > monitor length' do
@@ -139,7 +156,10 @@ module Sapristi
             y_size = 1 + monitor_height / 2
             file = create_valid_file_one_line('Y-position' => y, 'V-size' => y_size)
 
-            expect { subject.load file }.to raise_error(Error, /window y dimensions: \[#{y}, #{y + y_size}\] exceeds monitor height \[0..#{monitor_height - 1}\]/)
+            dimensions = "\\[#{y}, #{y + y_size}\\]"
+            valid = "\\[0..#{monitor_height - 1}\\]"
+            expect { subject.load file }
+              .to raise_error(Error, /window y dimensions: #{dimensions} exceeds monitor height #{valid}/)
           end
 
           it 'when witdh < 50' do
@@ -157,13 +177,15 @@ module Sapristi
               it "when #{field} percentage x < 5" do
                 raw = '4%'
                 file = create_valid_file_one_line(field => raw)
-                expect { subject.load file }.to raise_error(Error, /#{field} percentage is invalid=#{raw}, valid=5%-100%/)
+                expect { subject.load file }
+                  .to raise_error(Error, /#{field} percentage is invalid=#{raw}, valid=5%-100%/)
               end
 
               it "when #{field} percentage x > 100" do
                 raw = '101%'
                 file = create_valid_file_one_line(field => raw)
-                expect { subject.load file }.to raise_error(Error, /#{field} percentage is invalid=#{raw}, valid=5%-100%/)
+                expect { subject.load file }
+                  .to raise_error(Error, /#{field} percentage is invalid=#{raw}, valid=5%-100%/)
               end
             end
 
@@ -193,7 +215,8 @@ module Sapristi
             last_workspace_id = WindowManager.new.workspaces.size - 1
 
             file = create_valid_file_one_line('Workspace' => last_workspace_id + 1)
-            expect { subject.load file }.to raise_error(Error, /invalid workspace=#{last_workspace_id + 1} valid=0..#{last_workspace_id}/)
+            expect { subject.load file }
+              .to raise_error(Error, /invalid workspace=#{last_workspace_id + 1} valid=0..#{last_workspace_id}/)
           end
 
           it 'when workspace is not specified use current' do
