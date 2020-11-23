@@ -12,6 +12,12 @@ module Sapristi
       '/tmp/non_existent_file_path.csv'
     end
 
+    let(:file_path) do
+      file = '/tmp/some.csv'
+      File.delete file if File.exist? file
+      file
+    end
+
     let(:invalid_csv) do
       file = Tempfile.new('foo')
       file.write('hello world')
@@ -133,9 +139,12 @@ module Sapristi
               .to raise_error(Error, /y=#{y_pos} is outside of monitor height dimension=0..#{monitor_height - 1}/)
           end
 
+          let(:x_pos) { monitor_width / 2 }
+          let(:y_pos) { monitor_height / 2 }
+          let(:x_size) { 1 + monitor_width / 2 }
+          let(:y_size) { 1 + monitor_height / 2 }
+
           it 'when x + width > monitor width' do
-            x_pos = monitor_width / 2
-            x_size = 1 + monitor_width / 2
             file = create_valid_file_one_line('X-position' => x_pos, 'H-size' => x_size)
 
             dimensions = "\\[#{x_pos}, #{x_pos + x_size}\\]"
@@ -145,8 +154,6 @@ module Sapristi
           end
 
           it 'when y + length > monitor length' do
-            y_pos = monitor_height / 2
-            y_size = 1 + monitor_height / 2
             file = create_valid_file_one_line('Y-position' => y_pos, 'V-size' => y_size)
 
             dimensions = "\\[#{y_pos}, #{y_pos + y_size}\\]"
@@ -199,21 +206,20 @@ module Sapristi
           end
 
           it 'when workspace < 0' do
-            last_workspace_id = WindowManager.new.workspaces.size - 1
             file = create_valid_file_one_line('Workspace' => -1)
             expect { subject.load file }.to raise_error(Error, /invalid workspace=-1 valid=0..#{last_workspace_id}/)
           end
 
-          it 'when workspace id > last workspace id' do
-            last_workspace_id = WindowManager.new.workspaces.size - 1
+          let(:last_workspace_id) { WindowManager.new.workspaces.size - 1 }
+          let(:current_workspace_id) { WindowManager.new.workspaces.find(&:current).id }
 
+          it 'when workspace id > last workspace id' do
             file = create_valid_file_one_line('Workspace' => last_workspace_id + 1)
             expect { subject.load file }
               .to raise_error(Error, /invalid workspace=#{last_workspace_id + 1} valid=0..#{last_workspace_id}/)
           end
 
           it 'when workspace is not specified use current' do
-            current_workspace_id = WindowManager.new.workspaces.find(&:current).id
             file = create_valid_file_one_line('Workspace' => nil)
             expect(subject.load(file)[0]['Workspace']).to eq(current_workspace_id)
           end
@@ -247,11 +253,6 @@ module Sapristi
       end
 
       it 'saves definitions' do
-        file = Tempfile.new('foo')
-        file.close
-        file_path = file.path
-        file.unlink
-
         subject.save file_path, valid_csv_definitions
 
         expect(subject.load(file_path))
@@ -272,31 +273,30 @@ module Sapristi
     context 'configuration file' do
       let(:content) { subject.load(valid_csv) }
 
-      let(:xrandr_example) do
-        %(Monitors: 2
-	 0: +*some 3840/597x2160/336+0+0  DP-1
-	 1: +another 1920/509x1080/286+3840+0  HDMI-1)
+      before(:each) do
+        allow_any_instance_of(LinuxXrandrAdapter).to receive(:list_monitors).and_return(build(:xrandr_example))
       end
 
       it 'numeric fields are integers' do
         %w[X-position Y-position H-size V-size Workspace].each do |field|
-          expect(content[1][field]).not_to be_nil
           expect(content[1][field]).to be_instance_of Integer
         end
       end
 
-      it 'apply percentage using monitor dimensions position fields' do
-        translations = { 'H-size' => 'x', 'V-size' => 'y', 'X-position' => 'x', 'Y-position' => 'y' }
+      let(:monitor) { build(:monitor) }
 
-        %w[X-position Y-position H-size V-size].each do |field|
-          monitor = { id: 0, name: 'some',
-                      main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0 }.transform_keys(&:to_s)
-          allow_any_instance_of(LinuxXrandrAdapter).to receive(:list_monitors).and_return(xrandr_example)
-
+      RSpec.shared_examples 'percentage in field' do |field|
+        it "apply percentage in #{field}" do
+          translations = DefinitionParser::TRANSLATIONS
           expected = ((valid_csv_definitions[2][field][0..-2].to_i / 100.0) * monitor[translations[field]]).to_i
           expect(content[2][field]).to be expected
         end
       end
+
+      include_examples('percentage in field', 'X-position')
+      include_examples('percentage in field', 'Y-position')
+      include_examples('percentage in field', 'H-size')
+      include_examples('percentage in field', 'V-size')
     end
   end
 end
