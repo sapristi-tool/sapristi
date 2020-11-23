@@ -35,7 +35,7 @@ module Sapristi
 
     # FIXME
     it('can move windows') do
-      window = subject.launch('gedit --new-window')
+      window = subject.launch('gedit --new-window -s')
 
       inc_x = 10
       inc_y = 20
@@ -55,18 +55,21 @@ module Sapristi
 
     context('#find_window') do
       it 'one window by title' do
-        window = subject.launch('gedit --new-window deleteme_title.txt')
+        window = subject.launch('gedit --new-window deleteme_title.txt -s')
 
+        sleep 0.5
         actual_windows = subject.find_window(/deleteme_title.txt/)
                                 .map(&:to_h)
                                 .map { |w| w.reject { |k| k.eql? :active } }
-        expect(actual_windows).to eq([window.to_h.reject { |k| k.eql? :active }])
+
+        expect(actual_windows).to have(1).item
+        expect(actual_windows[0][:id]).to eq(window[:id])
       ensure
         subject.close(window) if window
       end
 
       it 'two windows by title' do
-        window1 = subject.launch('gedit --new-window deleteme_title.txt')
+        window1 = subject.launch('gedit --new-window deleteme_title.txt -s')
         window2 = subject.launch('sol')
 
         actual_windows = subject.find_window(/deleteme_title.txt|Klondike/).map(&:to_h)
@@ -105,7 +108,7 @@ module Sapristi
         user_id = `id -u`.strip
         previous_pids = `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i)
 
-        window = subject.launch('gedit --new-window /tmp/some_file.txt')
+        window = subject.launch('gedit --new-window /tmp/some_file.txt -s')
         expect(previous_pids).not_to include(window.pid)
       ensure
         subject.close(window) if window.pid

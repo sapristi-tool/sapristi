@@ -2,8 +2,12 @@
 
 module Sapristi
   class MonitorManager
+    def initialize
+      @os_manager = LinuxXrandrAdapter.new
+    end
+
     def get_monitor(name)
-      available = monitors
+      available = @os_manager.monitors
 
       return available[name] if available[name]
 
@@ -14,9 +18,9 @@ module Sapristi
       end
       main
     end
+  end
 
-    private
-
+  class LinuxXrandrAdapter
     RESOLUTION = '(?<x>[0-9]+)/[0-9]+x(?<y>[0-9]+)/[0-9]+'
     OFFSET = '(?<offset_x>[0-9]+)\\+(?<offset_y>[0-9]+)'
     MONITOR_LINE_REGEX = /^\s*+(?<id>[0-9]+):\s*\+(?<main>\*)?(?<name>[^\s]+)\s+#{RESOLUTION}\+#{OFFSET}.*$/.freeze
@@ -28,13 +32,18 @@ module Sapristi
       raise Error, "Error fetching monitor information: #{e}"
     end
 
+    private
+
     def list_monitors
       `xrandr --listmonitors`
     end
 
     def extract_monitor_info(line)
-      m = line.match(MONITOR_LINE_REGEX)
-      m.names.each_with_object({}) { |name, memo| memo[name] = m[name]&.match(/^[0-9]+$/) ? m[name].to_i : m[name] }
+      matcher = line.match(MONITOR_LINE_REGEX)
+      matcher.names.each_with_object({}) do |name, memo|
+        value = matcher[name]
+        memo[name] = value&.match(/^[0-9]+$/) ? value.to_i : value
+      end
     end
   end
 end

@@ -22,13 +22,14 @@ module Sapristi
     end
 
     it 'raises an error if xrandr execution fails' do
-      is_expected.to(receive(:list_monitors).and_wrap_original { |_m, *_args| `axrandr --listmonitors` })
+      allow_any_instance_of(LinuxXrandrAdapter)
+        .to(receive(:list_monitors).and_wrap_original { |_m, *_args| `axrandr --listmonitors` })
 
       expect { subject.get_monitor(nil) }.to raise_error(Error, /Error fetching monitor information/)
     end
 
     context('#get_monitor') do
-      before(:each) { is_expected.to receive(:list_monitors).and_return(xrandr_example) }
+      before(:each) { allow_any_instance_of(LinuxXrandrAdapter).to receive(:list_monitors).and_return(xrandr_example) }
 
       it 'a monitor' do
         expect(subject.get_monitor(a_monitor_name)).to eq(a_monitor)

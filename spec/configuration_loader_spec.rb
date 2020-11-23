@@ -92,7 +92,7 @@ module Sapristi
           end
 
           before(:each) do
-            allow_any_instance_of(MonitorManager).to receive(:list_monitors).and_return(xrandr_example)
+            allow_any_instance_of(LinuxXrandrAdapter).to receive(:list_monitors).and_return(xrandr_example)
             allow_any_instance_of(WindowManager).to receive(:workspaces).and_return(some_monitors)
           end
 
@@ -297,7 +297,7 @@ module Sapristi
         %w[X-position Y-position H-size V-size].each do |field|
           monitor = { id: 0, name: 'some',
                       main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0 }.transform_keys(&:to_s)
-          allow_any_instance_of(MonitorManager).to receive(:list_monitors).and_return(xrandr_example)
+          allow_any_instance_of(LinuxXrandrAdapter).to receive(:list_monitors).and_return(xrandr_example)
 
           expected = ((valid_csv_definitions[2][field][0..-2].to_i / 100.0) * monitor[translations[field]]).to_i
           expect(content[2][field]).to be expected
