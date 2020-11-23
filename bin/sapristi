@@ -6,10 +6,7 @@ require 'sapristi'
 
 def run_sapristi(args)
   options = Sapristi::ArgumentsParser.new.parse args
-
-  sapristi = Sapristi::Sapristi.new
-  sapristi.verbose! if options.verbose
-  sapristi.dry! if options.dry
+  sapristi = build(options)
 
   options.file ? sapristi.run(options.file) : sapristi.run
 rescue Sapristi::Error => e
@@ -19,6 +16,13 @@ rescue StandardError => e
   error_file = save_stacktrace e
   $stderr.puts "Sapristi crashed, see #{error_file}"
   exit 2
+end
+
+def build(options)
+  sapristi = Sapristi::Sapristi.new
+  sapristi.verbose! if options.verbose
+  sapristi.dry! if options.dry
+  sapristi
 end
 
 def save_stacktrace(error)
