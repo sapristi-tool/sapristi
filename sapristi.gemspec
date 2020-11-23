@@ -43,12 +43,12 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'fuubar', '~> 2.5.0'
   spec.add_development_dependency 'pry', '~> 0.12.2'
   spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'reek', '~> 6.0.2'
   spec.add_development_dependency 'rspec', '~> 3.10'
   spec.add_development_dependency 'rspec-collection_matchers', '~> 1.2.0'
   spec.add_development_dependency 'rubocop', '~> 1.3.1'
-  spec.add_development_dependency 'simplecov', '~> 0.19.0'
-  spec.add_development_dependency 'reek', '~> 6.0.2'
   spec.add_development_dependency 'rubycritic', '~> 4.5.2'
+  spec.add_development_dependency 'simplecov', '~> 0.19.0'
 
   spec.add_runtime_dependency 'ruby-wmctrl', '~> 0.0.8'
 end
