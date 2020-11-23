@@ -125,38 +125,38 @@ module Sapristi
           end
 
           it 'when fixed x < 0' do
-            x = -1
-            file = create_valid_file_one_line('X-position' => x)
+            x_pos = -1
+            file = create_valid_file_one_line('X-position' => x_pos)
 
             expect { subject.load file }
-              .to raise_error(Error, /x=#{x} is outside of monitor width dimension=0..#{monitor_width - 1}/)
+              .to raise_error(Error, /x=#{x_pos} is outside of monitor width dimension=0..#{monitor_width - 1}/)
           end
 
           it 'when fixed y < 0' do
-            y = -1
-            file = create_valid_file_one_line('Y-position' => y)
+            y_pos = -1
+            file = create_valid_file_one_line('Y-position' => y_pos)
 
             expect { subject.load file }
-              .to raise_error(Error, /y=#{y} is outside of monitor height dimension=0..#{monitor_height - 1}/)
+              .to raise_error(Error, /y=#{y_pos} is outside of monitor height dimension=0..#{monitor_height - 1}/)
           end
 
           it 'when x + width > monitor width' do
-            x = monitor_width / 2
+            x_pos = monitor_width / 2
             x_size = 1 + monitor_width / 2
-            file = create_valid_file_one_line('X-position' => x, 'H-size' => x_size)
+            file = create_valid_file_one_line('X-position' => x_pos, 'H-size' => x_size)
 
-            dimensions = "\\[#{x}, #{x + x_size}\\]"
+            dimensions = "\\[#{x_pos}, #{x_pos + x_size}\\]"
             valid = "\\[0..#{monitor_width - 1}\\]"
             expect { subject.load file }
               .to raise_error(Error, /window x dimensions: #{dimensions} exceeds monitor width #{valid}/)
           end
 
           it 'when y + length > monitor length' do
-            y = monitor_height / 2
+            y_pos = monitor_height / 2
             y_size = 1 + monitor_height / 2
-            file = create_valid_file_one_line('Y-position' => y, 'V-size' => y_size)
+            file = create_valid_file_one_line('Y-position' => y_pos, 'V-size' => y_size)
 
-            dimensions = "\\[#{y}, #{y + y_size}\\]"
+            dimensions = "\\[#{y_pos}, #{y_pos + y_size}\\]"
             valid = "\\[0..#{monitor_height - 1}\\]"
             expect { subject.load file }
               .to raise_error(Error, /window y dimensions: #{dimensions} exceeds monitor height #{valid}/)
@@ -261,7 +261,8 @@ module Sapristi
 
         subject.save file_path, valid_csv_definitions
 
-        expect(subject.load(file_path)).to eq(valid_csv_definitions.map { |d| DefinitionParser.new.parse d })
+        expect(subject.load(file_path))
+          .to eq(valid_csv_definitions.map { |definition| DefinitionParser.new.parse definition })
       end
 
       it 'writes empty configuration' do

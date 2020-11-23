@@ -31,34 +31,32 @@ module Sapristi
     end
 
     def launch(cmd, timeout_in_seconds = 30)
-      previous_windows = @display.windows
-      previous_pids = user_pids
+      window_detector = NewProcessWindowDetector.new
 
       waiter = execute_and_detach cmd
+      pid = waiter.pid
 
-      process_window = detect_window_for_process(waiter, previous_windows, previous_pids, timeout_in_seconds)
+      process_window = window_detector.detect_window_for_process(waiter, timeout_in_seconds)
 
       if process_window.nil?
-        Process.kill 'KILL', waiter.pid
+        Process.kill 'KILL', pid
         # sleep 1 # XLIB error for op code
         raise Error, "Error executing process, it didn't open a window"
       end
 
-      ::Sapristi.logger.info "  Found window title=#{process_window.title} for process=#{waiter.pid}!"
+      ::Sapristi.logger.info "  Found window title=#{process_window.title} for process=#{pid}!"
       process_window
     end
 
     GRAVITY = 0
     def resize(window, width, height)
-      x = window.geometry[0]
-      y = window.geometry[1]
+      x_pos, y_pos = window.geometry
 
-      @display.action_window(window.id, :move_resize, GRAVITY, x, y, width, height)
+      @display.action_window(window.id, :move_resize, GRAVITY, x_pos, y_pos, width, height)
     end
 
     def move(window, x_position, y_position)
-      width = window.geometry[2]
-      height = window.geometry[3]
+      width, height = window.geometry[2..3]
 
       @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
     end
@@ -69,11 +67,6 @@ module Sapristi
 
     private
 
-    def user_pids
-      user_id = `id -u`.strip
-      `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i)
-    end
-
     def execute_and_detach(cmd)
       process_pid = begin
         Process.spawn(cmd)
@@ -83,11 +76,21 @@ module Sapristi
       ::Sapristi.logger.info "Launch #{cmd.split[0]}, process=#{process_pid}"
       Process.detach process_pid
     end
+  end
 
-    def detect_window_for_process(waiter, previous_windows, previous_pids, timeout_in_seconds)
+  class NewProcessWindowDetector
+    def initialize
+      @display = WMCtrl.display
+      @previous_windows_ids = @display.windows.map { |window| window[:id] }
+      @previous_pids = user_pids
+    end
+
+    attr_reader :previous_windows_ids, :previous_pids
+
+    def detect_window_for_process(waiter, timeout_in_seconds)
       start_time = Time.now
       while Time.now - start_time < timeout_in_seconds && waiter.alive?
-        process_window = detect_new_windows(previous_windows, previous_pids).find { |w| w.pid.eql? waiter.pid }
+        process_window = detect_new_windows.find { |window| window.pid.eql? waiter.pid }
 
         break if process_window
 
@@ -99,12 +102,19 @@ module Sapristi
       process_window
     end
 
-    def detect_new_windows(previous_windows, previous_pids)
-      new_windows_found = @display.windows.filter do |w|
-        !previous_pids.include?(w.pid) && previous_windows.none? { |old| old.id.eql? w.id }
+    private
+    
+    def user_pids
+      user_id = `id -u`.strip
+      `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i)
+    end
+
+    def detect_new_windows
+      new_windows = @display.windows.filter do |window|
+        !previous_pids.include?(window.pid) && !previous_windows_ids.include?(window.id)
       end
 
-      new_windows_found.each { |w| ::Sapristi.logger.debug "  Found new window=#{w.pid}: #{w.title}" }
+      new_windows.each { |window| ::Sapristi.logger.debug "  Found new window=#{window.pid}: #{window.title}" }
     end
   end
 end

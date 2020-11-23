@@ -7,7 +7,7 @@ module Sapristi
     subject { WindowManager.new }
 
     it('fetch open windows returns same result as command line wmctrl') do
-      expected = `wmctrl -l`.split("\n").map { |w| w.split[0].to_i(16) }
+      expected = `wmctrl -l`.split("\n").map { |line| line.split[0].to_i(16) }
       actual = subject.windows.map(&:id)
 
       expect(actual).to contain_exactly(*expected)
@@ -24,7 +24,7 @@ module Sapristi
       subject.resize(window, expected_width, expected_height)
       sleep 1
 
-      updated_window = subject.windows.find { |w| w.id.eql? window.id }
+      updated_window = subject.windows.find { |actual_window| actual_window.id.eql? window.id }
 
       expect(updated_window.geometry[2]).to eq(expected_width)
       expect(updated_window.geometry[3]).to eq(expected_height)
@@ -39,16 +39,16 @@ module Sapristi
 
       inc_x = 10
       inc_y = 20
-      x = window.geometry[0] + inc_x
-      y = window.geometry[1] + inc_y
+      x_pos = window.geometry[0] + inc_x
+      y_pos = window.geometry[1] + inc_y
 
-      subject.move(window, x, y)
+      subject.move(window, x_pos, y_pos)
       sleep 1
 
-      updated_window = subject.windows.find { |w| w.id.eql? window.id }
+      updated_window = subject.windows.find { |actual_window| actual_window.id.eql? window.id }
 
-      expect(updated_window.geometry[0]).to eq(x)
-      expect(updated_window.geometry[1]).to eq(y)
+      expect(updated_window.geometry[0]).to eq(x_pos)
+      expect(updated_window.geometry[1]).to eq(y_pos)
     ensure
       subject.close(window) if window
     end
@@ -58,9 +58,7 @@ module Sapristi
         window = subject.launch('gedit --new-window deleteme_title.txt -s')
 
         sleep 0.5
-        actual_windows = subject.find_window(/deleteme_title.txt/)
-                                .map(&:to_h)
-                                .map { |w| w.reject { |k| k.eql? :active } }
+        actual_windows = subject.find_window(/deleteme_title.txt/).map(&:to_h)
 
         expect(actual_windows).to have(1).item
         expect(actual_windows[0][:id]).to eq(window[:id])
@@ -69,14 +67,14 @@ module Sapristi
       end
 
       it 'two windows by title' do
-        window1 = subject.launch('gedit --new-window deleteme_title.txt -s')
-        window2 = subject.launch('sol')
+        a_window = subject.launch('gedit --new-window deleteme_title.txt -s')
+        another_window = subject.launch('sol')
 
         actual_windows = subject.find_window(/deleteme_title.txt|Klondike/).map(&:to_h)
         expect(actual_windows.to_a).to have(2).items
       ensure
-        subject.close(window1) if window1
-        subject.close(window2) if window2
+        subject.close(a_window) if a_window
+        subject.close(another_window) if another_window
       end
 
       it 'empty list when window not found' do

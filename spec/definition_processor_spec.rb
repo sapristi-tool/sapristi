@@ -36,16 +36,16 @@ module Sapristi
 
         it('when more than one window have the same title') do
           window_manager = WindowManager.new
-          window1 = window_manager.launch command
-          window2 = window_manager.launch command
+          a_window = window_manager.launch command
+          another_window = window_manager.launch command
 
           duplicated_title = /Klondike/
           expect do
             subject.process_definition({ 'Title' => duplicated_title, 'Command' => nil })
           end.to raise_error Error, "2 windows have the same title: #{duplicated_title}"
         ensure
-          window_manager.close(window1) if window1
-          window_manager.close(window2) if window2
+          window_manager.close(a_window) if a_window
+          window_manager.close(another_window) if another_window
         end
       end
     end

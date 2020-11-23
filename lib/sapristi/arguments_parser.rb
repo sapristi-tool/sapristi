@@ -8,26 +8,26 @@ module Sapristi
     def parse(options)
       args = OpenStruct.new
 
-      build_parser(args).parse!(options)
+      ArgumentsParser.build_parser(args).parse!(options)
       args
     end
 
     private
 
-    def build_parser(args)
+    def self.build_parser(args)
       OptionParser.new do |opts|
-        opts.banner = 'Usage: sapristi [options]'
+        ArgumentsParser.populate_options(opts, args)
+      end
+    end
 
-        opts.on('-v', '--verbose', 'Verbose mode') { |n| args.verbose = n }
-
-        opts.on('--dry-run', 'Dry run') { |n| args.dry = n }
-
-        opts.on('-f', '--file FILE', 'Read configuration from FILE') { |file| args.file = file }
-
-        opts.on('-h', '--help', 'Prints this help') do
-          puts opts
-          exit
-        end
+    def self.populate_options(opts, args)
+      opts.banner = 'Usage: sapristi [options]'
+      opts.on('-v', '--verbose', 'Verbose mode') { |value| args.verbose = value }
+      opts.on('--dry-run', 'Dry run') { |value| args.dry = value }
+      opts.on('-f', '--file FILE', 'Read configuration from FILE') { |file| args.file = file }
+      opts.on('-h', '--help', 'Prints this help') do
+        puts opts
+        exit
       end
     end
   end

@@ -9,16 +9,10 @@ module Sapristi
       @definition_parser = DefinitionParser.new
     end
 
-    def load(file)
-      csv_rows = load_csv(file)
+    def load(file_path)
+      csv_rows = load_csv(file_path)
 
-      csv_rows.each_with_index.map do |definition, line|
-        @definition_parser.parse(definition)
-      rescue Error => e
-        raise Error, "Invalid configuration file: #{e.message}, line=#{line}"
-      rescue StandardError => e
-        raise Error, "Unable to process configuration file: #{file}, line=#{line}, error=#{e.message}"
-      end
+      parse_rows(csv_rows, file_path)
     end
 
     def valid_headers
@@ -34,17 +28,35 @@ module Sapristi
     def save(conf_file, definitions)
       raise Error, "Trying to write configuration on existing file #{conf_file}" if File.exist? conf_file
 
-      CSV.open(conf_file, 'wb', write_headers: true, headers: valid_headers, col_sep: SEPARATOR) do |csv|
-        definitions.each do |definition|
-          csv << valid_headers.map do |k|
-            raw_key = k + DefinitionParser::NORMALIZED_FIELD_SUFFIX
-            definition.key?(raw_key) ? definition[raw_key] : definition[k]
-          end
-        end
-      end
+      serialized = definitions.map { |definition| serialize definition }
+
+      write_to_csv conf_file, serialized
     end
 
     private
+
+    def write_to_csv(conf_file, serialized)
+      CSV.open(conf_file, 'wb', write_headers: true, headers: valid_headers, col_sep: SEPARATOR) do |csv|
+        serialized.each { |definition| csv << definition }
+      end
+    end
+
+    def serialize(definition)
+      valid_headers.map do |field|
+        raw_key = field + DefinitionParser::NORMALIZED_FIELD_SUFFIX
+        definition.key?(raw_key) ? definition[raw_key] : definition[field]
+      end
+    end
+
+    def parse_rows(csv_rows, file)
+      csv_rows.each_with_index.map do |definition, line|
+        @definition_parser.parse(definition)
+      rescue Error => e
+        raise Error, "Invalid configuration file: #{e.message}, line=#{line}"
+      rescue StandardError => e
+        raise Error, "Unable to process configuration file: #{file}, line=#{line}, error=#{e.message}"
+      end
+    end
 
     def load_csv(csv_file)
       table = CSV.read(csv_file, headers: true, col_sep: SEPARATOR)
@@ -58,9 +70,10 @@ module Sapristi
     end
 
     def validate_headers(table)
-      return if table.headers.eql? valid_headers
+      headers = table.headers
+      return if headers.eql? valid_headers
 
-      actual_headers = table.headers.join(', ')
+      actual_headers = headers.join(', ')
       expected_headers = valid_headers.join(', ')
       raise Error, "Invalid configuration file: invalid headers=#{actual_headers}, valid=#{expected_headers}"
     end
