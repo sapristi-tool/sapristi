@@ -6,6 +6,15 @@ module Sapristi
   RSpec.describe WindowManager do
     subject { WindowManager.new }
 
+    before(:each) { @windows = [] }
+    after(:each) { @windows.each { |window| subject.close(window) } }
+
+    def launch_n_windows(number_of_windows, command = 'sol')
+      number_of_windows.times { |_i| @windows.push subject.launch(command) }
+      sleep 0.5
+      @windows
+    end
+
     it('fetch open windows returns same result as command line wmctrl') do
       expected = `wmctrl -l`.split("\n").map { |line| line.split[0].to_i(16) }
       actual = subject.windows.map(&:id)
@@ -14,67 +23,47 @@ module Sapristi
     end
 
     # FIXME
-    it('can resize windows') do
-      window = subject.launch('sol')
+    context('window manipulation') do
+      let(:window) { launch_n_windows(1, 'gedit --new-window -s').first }
+      let(:expected_width) { window.geometry[2] - inc_x }
+      let(:expected_height) { window.geometry[3] - inc_y }
+      let(:window_geometry) { subject.windows.find { |actual_window| actual_window.id.eql? window.id }.geometry }
 
-      inc_x = -10
-      inc_y = -20
-      expected_width = window.geometry[2] + inc_x
-      expected_height = window.geometry[3] + inc_y
-      subject.resize(window, expected_width, expected_height)
-      sleep 1
+      it('can resize windows') do
+        subject.resize(window, expected_width, expected_height)
+        sleep 0.5
 
-      updated_window = subject.windows.find { |actual_window| actual_window.id.eql? window.id }
+        expect(window_geometry[2..3]).to eq([expected_width, expected_height])
+      end
 
-      expect(updated_window.geometry[2]).to eq(expected_width)
-      expect(updated_window.geometry[3]).to eq(expected_height)
-    ensure
-      # Process.kill "KILL", window.pid if window
-      subject.close(window) if window
-    end
+      let(:inc_x) { 10 }
+      let(:inc_y) { 20 }
+      let(:x_pos) { window.geometry[0] + inc_x }
+      let(:y_pos) { window.geometry[1] + inc_y }
 
-    # FIXME
-    it('can move windows') do
-      window = subject.launch('gedit --new-window -s')
+      # FIXME
+      it('can move windows') do
+        subject.move(window, x_pos, y_pos)
+        sleep 0.6
 
-      inc_x = 10
-      inc_y = 20
-      x_pos = window.geometry[0] + inc_x
-      y_pos = window.geometry[1] + inc_y
-
-      subject.move(window, x_pos, y_pos)
-      sleep 1
-
-      updated_window = subject.windows.find { |actual_window| actual_window.id.eql? window.id }
-
-      expect(updated_window.geometry[0]).to eq(x_pos)
-      expect(updated_window.geometry[1]).to eq(y_pos)
-    ensure
-      subject.close(window) if window
+        expect(window_geometry[0..1]).to eq([x_pos, y_pos])
+      end
     end
 
     context('#find_window') do
       it 'one window by title' do
-        window = subject.launch('gedit --new-window deleteme_title.txt -s')
+        expected = launch_n_windows(1, 'gedit --new-window deleteme_title.txt -s').map(&:id)
 
-        sleep 0.5
-        actual_windows = subject.find_window(/deleteme_title.txt/).map(&:to_h)
+        actual_windows = subject.find_window(/deleteme_title.txt/).map(&:id)
 
-        expect(actual_windows).to have(1).item
-        expect(actual_windows[0][:id]).to eq(window[:id])
-      ensure
-        subject.close(window) if window
+        expect(actual_windows).to eq(expected)
       end
 
       it 'two windows by title' do
-        a_window = subject.launch('gedit --new-window deleteme_title.txt -s')
-        another_window = subject.launch('sol')
+        expected = launch_n_windows(2, 'sol').map(&:id)
 
-        actual_windows = subject.find_window(/deleteme_title.txt|Klondike/).map(&:to_h)
-        expect(actual_windows.to_a).to have(2).items
-      ensure
-        subject.close(a_window) if a_window
-        subject.close(another_window) if another_window
+        actual_windows = subject.find_window(/Klondike/).map(&:id)
+        expect(actual_windows.to_a).to eq(expected)
       end
 
       it 'empty list when window not found' do
@@ -103,14 +92,15 @@ module Sapristi
       end
 
       it('launches a new gedit window and process') do
-        user_id = `id -u`.strip
-        previous_pids = `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i)
-
+        previous_pids = current_user_pids
         window = subject.launch('gedit --new-window /tmp/some_file.txt -s')
         expect(previous_pids).not_to include(window.pid)
       ensure
-        subject.close(window) if window.pid
+        subject.close(window) if window
       end
+
+      let(:user_id) { `id -u`.strip }
+      let(:current_user_pids) { `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i) }
     end
   end
 end

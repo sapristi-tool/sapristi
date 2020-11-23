@@ -9,6 +9,7 @@ end
 require 'bundler/setup'
 require 'sapristi'
 require 'rspec/collection_matchers'
+require 'factory_bot'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -22,4 +23,10 @@ RSpec.configure do |config|
   end
 
   Sapristi.logger.level = Logger::ERROR
+
+  config.include FactoryBot::Syntax::Methods
+
+  config.before(:suite) do
+    FactoryBot.find_definitions
+  end
 end
