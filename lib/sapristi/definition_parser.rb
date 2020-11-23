@@ -103,7 +103,9 @@ module Sapristi
 
     def validate_percentage_field(key, raw)
       translated_key = TRANSLATIONS[key]
-      raise "#{key}=#{raw}, using percentage in invalid field, valid=#{TRANSLATIONS.keys.join(', ')}" unless translated_key
+      unless translated_key
+        raise "#{key}=#{raw}, using percentage in invalid field, valid=#{TRANSLATIONS.keys.join(', ')}"
+      end
 
       value = raw.to_s.match(/^([0-9]+)%$/)[1].to_i
       raise Error, "#{key} percentage is invalid=#{raw}, valid=5%-100%" if value < 5 || value > 100

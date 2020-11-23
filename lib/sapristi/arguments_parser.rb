@@ -12,8 +12,6 @@ module Sapristi
       args
     end
 
-    private
-
     def self.build_parser(args)
       OptionParser.new do |opts|
         ArgumentsParser.populate_options(opts, args)

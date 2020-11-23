@@ -22,17 +22,17 @@ module Sapristi
     let(:valid_headers) { %w[Title Command Monitor X-position Y-position H-size V-size Workspace] }
     let(:separator) { ',' }
 
-    let(:valid_csv) do
+    def produce_csv_file(headers, separator, rows)
       file = Tempfile.new('bar')
-      file.write(valid_headers.join(separator))
-      file.write "\n"
-      valid_csv_definitions.each do |valid_definition|
-        file.write valid_headers.map { |header| valid_definition[header] }.join(separator)
-        file.write "\n"
-      end
+      file.write("#{headers.join(separator)}\n")
+      file.write rows.map { |row| headers.map { |field| row[field] }.join(separator) }.join("\n")
       file.close
 
       file.path
+    end
+
+    let(:valid_csv) do
+      produce_csv_file valid_headers, separator, valid_csv_definitions
     end
 
     let(:valid_csv_definitions) do

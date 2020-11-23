@@ -103,7 +103,7 @@ module Sapristi
     end
 
     private
-    
+
     def user_pids
       user_id = `id -u`.strip
       `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i)
