@@ -50,14 +50,13 @@ module Sapristi
 
     GRAVITY = 0
     def resize(window, width, height)
-      x_pos, y_pos = window.geometry
+      x_pos, y_pos = @display.windows(id: window.id).first.geometry
 
       @display.action_window(window.id, :move_resize, GRAVITY, x_pos, y_pos, width, height)
     end
 
     def move(window, x_position, y_position)
-      width, height = window.geometry[2..3]
-
+      width, height = @display.windows(id: window.id).first.geometry[2..3]
       @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
     end
 
