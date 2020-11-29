@@ -25,7 +25,9 @@ module Sapristi
 
     factory :monitor, class: Hash do
       data do
-        { id: 0, name: 'some', main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0 }.transform_keys(&:to_s)
+        { id: 0, name: 'some', main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0,
+          work_area: [0, 0, 3000, 2000],
+          work_area_width: 3000, work_area_height: 2000 }.transform_keys(&:to_s)
       end
 
       initialize_with { data }
