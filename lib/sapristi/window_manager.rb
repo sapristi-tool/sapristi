@@ -49,15 +49,28 @@ module Sapristi
     end
 
     GRAVITY = 0
-    def resize(window, width, height)
-      x_pos, y_pos = @display.windows(id: window.id).first.geometry
+    TIME_TO_APPLY_DIMENSIONS = 0.5
+    def move_resize(window, x_position, y_position, width, height)
+      @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
+      sleep TIME_TO_APPLY_DIMENSIONS
+      expected = [x_position, y_position, width, height]
+      check_expected_geometry window, expected
+    end
 
-      @display.action_window(window.id, :move_resize, GRAVITY, x_pos, y_pos, width, height)
+    def resize(window, width, height)
+      x_position, y_position = @display.windows(id: window.id).first.geometry
+      @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
+      sleep TIME_TO_APPLY_DIMENSIONS
+      expected = [x_position, y_position, width, height]
+      check_expected_geometry window, expected
     end
 
     def move(window, x_position, y_position)
       width, height = @display.windows(id: window.id).first.geometry[2..3]
       @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
+      sleep TIME_TO_APPLY_DIMENSIONS
+      expected = [x_position, y_position, width, height]
+      check_expected_geometry window, expected
     end
 
     def workspaces
@@ -74,6 +87,17 @@ module Sapristi
       end
       ::Sapristi.logger.info "Launch #{cmd.split[0]}, process=#{process_pid}"
       Process.detach process_pid
+    end
+
+    def check_expected_geometry window, expected
+      actual = @display.windows(id: window.id).first.geometry
+
+      diffs = 4.times.filter {|i| !expected[i].eql? actual[i] }
+      labels = %w{ x y width heigh }
+      txt = diffs.map {|i| "#{labels[i]}: expected=#{expected[i]}, actual=#{actual[i]}" }.join(', ')
+
+      
+      ::Sapristi.logger.warn "Geometry mismatch #{txt}, requested=#{expected}" unless actual.eql? expected
     end
   end
 

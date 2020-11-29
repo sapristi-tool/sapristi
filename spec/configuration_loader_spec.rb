@@ -173,12 +173,14 @@ module Sapristi
           end
 
           context('percentages') do
-            RSpec.shared_examples 'geometry percentage' do |field|
-              it "when #{field} percentage x < 5" do
-                raw = '4%'
-                file = create_valid_file_one_line(field => raw)
-                expect { subject.load file }
-                  .to raise_error(Error, /#{field} percentage is invalid=#{raw}, valid=5%-100%/)
+            RSpec.shared_examples 'geometry percentage' do |field, min_percentage = 5|
+              it "when #{field} percentage x < #{min_percentage}" do
+                if min_percentage.positive?
+                  raw = "#{min_percentage - 1}%"
+                  file = create_valid_file_one_line(field => raw)
+                  expect { subject.load file }
+                    .to raise_error(Error, /#{field} percentage is invalid=#{raw}, valid=#{min_percentage}%-100%/)
+                end
               end
 
               it "when #{field} percentage x > 100" do
@@ -189,8 +191,8 @@ module Sapristi
               end
             end
 
-            include_examples 'geometry percentage', 'X-position'
-            include_examples 'geometry percentage', 'Y-position'
+            include_examples 'geometry percentage', 'X-position', 0
+            include_examples 'geometry percentage', 'Y-position', 0
             include_examples 'geometry percentage', 'H-size'
             include_examples 'geometry percentage', 'V-size'
           end
@@ -274,7 +276,7 @@ module Sapristi
       let(:content) { subject.load(valid_csv) }
 
       before(:each) do
-        allow_any_instance_of(LinuxXrandrAdapter).to receive(:list_monitors).and_return(build(:xrandr_example))
+        allow_any_instance_of(LinuxXrandrAdapter).to receive(:monitors).and_return(main: build(:monitor))
       end
 
       it 'numeric fields are integers' do

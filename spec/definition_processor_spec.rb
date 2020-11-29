@@ -23,8 +23,7 @@ module Sapristi
 
         DefinitionProcessor.new(window_manager).process_definition({ 'Title' => 'Klondike', 'Command' => command })
 
-        expect(window_manager).to have_received(:resize).with(window, nil, nil)
-        expect(window_manager).to have_received(:move).with(window, nil, nil)
+        expect(window_manager).to have_received(:move_resize).with(window, nil, nil, nil, nil)
       end
 
       context('raises an error') do
@@ -69,16 +68,10 @@ module Sapristi
           'H-size' => size_x, 'V-size' => size_y }
       end
 
-      it 'move window' do
+      it 'move and resize window' do
         subject.process_definition(definition)
 
-        expect(window_manager).to have_received(:move).with(window, x_position, y_position)
-      end
-
-      it 'move window' do
-        subject.process_definition(definition)
-
-        expect(window_manager).to have_received(:resize).with(window, size_x, size_y)
+        expect(window_manager).to have_received(:move_resize).with(window, x_position, y_position, size_x, size_y)
       end
     end
   end
