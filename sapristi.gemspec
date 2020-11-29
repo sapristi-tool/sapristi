@@ -51,5 +51,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubycritic', '~> 4.5.2'
   spec.add_development_dependency 'simplecov', '~> 0.19.0'
 
+  spec.add_runtime_dependency 'gtk3', '~> 3.4.3'
   spec.add_runtime_dependency 'ruby-wmctrl', '~> 0.0.8'
 end
