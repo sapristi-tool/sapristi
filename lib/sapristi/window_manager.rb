@@ -89,14 +89,13 @@ module Sapristi
       Process.detach process_pid
     end
 
-    def check_expected_geometry window, expected
+    def check_expected_geometry(window, expected)
       actual = @display.windows(id: window.id).first.geometry
 
-      diffs = 4.times.filter {|i| !expected[i].eql? actual[i] }
-      labels = %w{ x y width heigh }
-      txt = diffs.map {|i| "#{labels[i]}: expected=#{expected[i]}, actual=#{actual[i]}" }.join(', ')
+      diffs = 4.times.filter { |i| !expected[i].eql? actual[i] }
+      labels = %w[x y width heigh]
+      txt = diffs.map { |i| "#{labels[i]}: expected=#{expected[i]}, actual=#{actual[i]}" }.join(', ')
 
-      
       ::Sapristi.logger.warn "Geometry mismatch #{txt}, requested=#{expected}" unless actual.eql? expected
     end
   end

@@ -59,7 +59,8 @@ module Sapristi
         work_area.x - monitor_info['offset_x'],
         work_area.y - monitor_info['offset_y'],
         work_area.x + work_area.width - monitor_info['offset_x'],
-        work_area.y + work_area.height - monitor_info['offset_y']]
+        work_area.y + work_area.height - monitor_info['offset_y']
+      ]
       monitor_info['work_area_width'] = work_area.width
       monitor_info['work_area_height'] = work_area.height
 

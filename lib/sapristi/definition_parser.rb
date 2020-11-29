@@ -2,7 +2,10 @@
 
 module Sapristi
   class DefinitionParser
-    TRANSLATIONS = { 'H-size' => 'work_area_width', 'V-size' => 'work_area_height', 'X-position' => 'work_area_width', 'Y-position' => 'work_area_height' }.freeze
+    TRANSLATIONS = {
+      'H-size' => 'work_area_width', 'V-size' => 'work_area_height',
+      'X-position' => 'work_area_width', 'Y-position' => 'work_area_height'
+    }.freeze
     NUMERIC_FIELDS = (TRANSLATIONS.keys + %w[Workspace Monitor]).freeze
     NORMALIZED_FIELD_SUFFIX = '_raw'
 
@@ -107,7 +110,7 @@ module Sapristi
 
     def validate_percentage_field(key, raw)
       translated_key = TRANSLATIONS[key]
-      min_percentage = {"V-size" => 5, "H-size" => 5}.fetch(key, 0)
+      min_percentage = { 'V-size' => 5, 'H-size' => 5 }.fetch(key, 0)
       unless translated_key
         raise "#{key}=#{raw}, using percentage in invalid field, valid=#{TRANSLATIONS.keys.join(', ')}"
       end
