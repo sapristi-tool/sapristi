@@ -4,34 +4,46 @@
 require 'bundler/setup'
 require 'sapristi'
 
-def run_sapristi(args)
-  options = Sapristi::ArgumentsParser.new.parse args
-  sapristi = build(options)
+module Sapristi
+  class Runner
+    def initialize
+      @sapristi = Sapristi.new
+    end
 
-  options.file ? sapristi.run(options.file) : sapristi.run
-rescue Sapristi::Error => e
-  $stderr.puts e.message
-  exit 1
-rescue StandardError => e
-  error_file = save_stacktrace e
-  $stderr.puts "Sapristi crashed, see #{error_file}"
-  exit 2
-end
+    def run(args)
+      options = ArgumentsParser.new.parse args
+      build(options)
 
-def build(options)
-  sapristi = Sapristi::Sapristi.new
-  sapristi.verbose! if options.verbose
-  sapristi.dry! if options.dry
-  sapristi
-end
+      options.file ? @sapristi.run(options.file) : @sapristi.run
+    rescue Error => e
+      exit_error 1, e.message
+    rescue StandardError => e
+      error_file = save_stacktrace e
 
-def save_stacktrace(error)
-  file = File.join '/tmp', "sapristi.stacktrace#{Time.new.to_i}.log"
-  File.open(file, 'w') do |f|
-    f.write "#{error.class}: #{error.message}\n\n"
-    f.write error.backtrace.join("\n")
+      exit_error 2, "Sapristi crashed, see #{error_file}"
+    end
+
+    private
+
+    def build(options)
+      @sapristi.verbose! if options.verbose
+      @sapristi.dry! if options.dry
+    end
+
+    def save_stacktrace(error)
+      file = File.join '/tmp', "sapristi.stacktrace#{Time.new.to_i}.log"
+      File.open(file, 'w') do |f|
+        f.write "#{error.class}: #{error.message}\n\n"
+        f.write error.backtrace.join("\n")
+      end
+      file
+    end
+
+    def exit_error(status, message)
+      $stderr.puts message
+      exit status
+    end
   end
-  file
 end
 
-run_sapristi(ARGV) if $PROGRAM_NAME == __FILE__
+Sapristi::Runner.new.run(ARGV) if $PROGRAM_NAME == __FILE__

@@ -6,8 +6,9 @@ require 'tempfile'
 load File.join __dir__, '..', '/bin/sapristi'
 
 module Sapristi
-  RSpec.describe 'SapristiRunner' do
+  RSpec.describe Runner do
     let(:runner_path) { File.join 'bin', 'sapristi' }
+    subject { Runner.new }
 
     it 'is executable' do
       expect(File.executable?(runner_path)).to be_truthy
@@ -16,28 +17,28 @@ module Sapristi
     it 'calls sapristin run with no args' do
       expect_any_instance_of(Sapristi).to receive(:run).with(no_args)
 
-      run_sapristi []
+      subject.run []
     end
 
     it 'calls sapristi run with verbose' do
       expect_any_instance_of(Sapristi).to receive(:verbose!)
       allow_any_instance_of(Sapristi).to receive(:run)
 
-      run_sapristi ['-v']
+      subject.run ['-v']
     end
 
     it 'calls sapristi run with file' do
       expected_file = '/tmp/foo'
       allow_any_instance_of(Sapristi).to receive(:run).with(expected_file)
 
-      run_sapristi ['-f', expected_file]
+      subject.run ['-f', expected_file]
     end
 
     it 'calls sapristi run dry' do
       expect_any_instance_of(Sapristi).to receive(:dry!)
       allow_any_instance_of(Sapristi).to receive(:run)
 
-      run_sapristi ['--dry-run']
+      subject.run ['--dry-run']
     end
 
     context 'errors' do
@@ -49,7 +50,7 @@ module Sapristi
           invalid_file = '/tmp/non_existing_file'
           allow_any_instance_of(Kernel).to receive(:exit).and_return(1)
 
-          expect { run_sapristi ['-f', invalid_file] }.to output(/#{invalid_file}/).to_stderr
+          expect { subject.run ['-f', invalid_file] }.to output(/#{invalid_file}/).to_stderr
         end
 
         it 'output line number if available' do
@@ -61,13 +62,13 @@ module Sapristi
           file.close
 
           allow_any_instance_of(Kernel).to receive(:exit).and_return(1)
-          expect { run_sapristi ['-f', file.path] }.to output(/.+, line=0/).to_stderr
+          expect { subject.run ['-f', file.path] }.to output(/.+, line=0/).to_stderr
         end
 
         it 'return 1 status' do
           invalid_file = '/tmp/non_existing_file'
 
-          expect { run_sapristi ['-f', invalid_file] }.to raise_error(SystemExit) do |error|
+          expect { subject.run ['-f', invalid_file] }.to raise_error(SystemExit) do |error|
             expect(error.status).to eq(1)
           end
         end
@@ -78,14 +79,14 @@ module Sapristi
           expect_any_instance_of(Sapristi).to receive(:run).and_raise(ArgumentError, 'some')
 
           allow_any_instance_of(Kernel).to receive(:exit).and_return(1)
-          expect { run_sapristi [] }.to output(%r{Sapristi crashed, see /tmp/sapristi.stacktrace.[0-9]+.log}).to_stderr
+          expect { subject.run [] }.to output(%r{Sapristi crashed, see /tmp/sapristi.stacktrace.[0-9]+.log}).to_stderr
         end
 
         it 'generates a crash file in tmp with the stack trace' do
           expect_any_instance_of(Sapristi).to receive(:run).and_raise(ArgumentError, 'some')
 
           allow($stderr).to receive(:puts)
-          expect { run_sapristi [] }.to raise_error(SystemExit) do |error|
+          expect { subject.run [] }.to raise_error(SystemExit) do |error|
             expect(error.status).to eq(2)
 
             expect($stderr).to have_received(:puts).with(lambda { |args|
@@ -101,7 +102,7 @@ module Sapristi
         it 'return 2 status' do
           expect_any_instance_of(Sapristi).to receive(:run).and_raise(ArgumentError, 'some')
 
-          expect { run_sapristi [] }.to raise_error(SystemExit) do |error|
+          expect { subject.run [] }.to raise_error(SystemExit) do |error|
             expect(error.status).to eq(2)
           end
         end
