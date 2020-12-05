@@ -34,17 +34,16 @@ module Sapristi
       window_detector = NewProcessWindowDetector.new
 
       waiter = execute_and_detach cmd
-      pid = waiter.pid
 
       process_window = window_detector.detect_window_for_process(waiter, timeout_in_seconds)
 
       if process_window.nil?
-        Process.kill 'KILL', pid
+        Process.kill 'KILL', waiter.pid
         # sleep 1 # XLIB error for op code
         raise Error, "Error executing process, it didn't open a window"
       end
 
-      ::Sapristi.logger.info "  Found window title=#{process_window.title} for process=#{pid}!"
+      ::Sapristi.logger.info "  Found window title=#{process_window.title} for process=#{waiter.pid}!"
       process_window
     end
 
@@ -102,48 +101,6 @@ module Sapristi
       diffs.map { |diff_index| "#{LABELS[diff_index]}: expected=#{expected[diff_index]}, actual=#{actual[diff_index]}" }.join(', ')
     end
 
-    private_class_method :text_diff
-  end
-
-  class NewProcessWindowDetector
-    def initialize
-      @display = WMCtrl.display
-      @previous_windows_ids = @display.windows.map { |window| window[:id] }
-      @previous_pids = NewProcessWindowDetector.user_pids
-    end
-
-    attr_reader :previous_windows_ids, :previous_pids
-
-    def detect_window_for_process(waiter, timeout_in_seconds)
-      start_time = Time.now
-      while Time.now - start_time < timeout_in_seconds && waiter.alive?
-        process_window = detect_new_windows.find { |window| window.pid.eql? waiter.pid }
-
-        break if process_window
-
-        sleep 0.5
-      end
-
-      raise Error, 'Error executing process, is dead' unless waiter.alive?
-
-      process_window
-    end
-
-    private
-
-    def self.user_pids
-      user_id = `id -u`.strip
-      `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i)
-    end
-
-    def detect_new_windows
-      new_windows = @display.windows.filter { |window| new_window?(window) }
-
-      new_windows.each { |window| ::Sapristi.logger.debug "  Found new window=#{window.pid}: #{window.title}" }
-    end
-
-    def new_window?(window)
-      !previous_pids.include?(window.pid) && !previous_windows_ids.include?(window.id)
-    end
+    #private_class_method :text_diff
   end
 end
