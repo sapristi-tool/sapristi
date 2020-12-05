@@ -69,7 +69,7 @@ module Sapristi
 
       let(:definition) do
         Definition.new({ 'Command' => command, 'X-position' => x_position, 'Y-position' => y_position,
-          'H-size' => size_x, 'V-size' => size_y })
+                         'H-size' => size_x, 'V-size' => size_y })
       end
 
       it 'move and resize window' do

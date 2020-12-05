@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'sapristi/version'
+require 'sapristi/attribute_normalizer'
 require 'sapristi/monitor_manager'
 require 'sapristi/definition_parser'
 require 'sapristi/configuration_loader'
