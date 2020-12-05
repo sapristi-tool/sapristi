@@ -10,6 +10,7 @@ require 'sapristi/window_manager'
 require 'sapristi/definition_processor'
 require 'sapristi/sapristi'
 require 'sapristi/arguments_parser'
+require 'sapristi/linux_xrandr_adapter'
 require 'logger'
 
 module Sapristi
