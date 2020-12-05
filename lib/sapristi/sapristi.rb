@@ -5,9 +5,11 @@ module Sapristi
     def initialize(configuration_loader: ConfigurationLoader.new, definition_processor: DefinitionProcessor.new)
       @configuration_loader = configuration_loader
       @definition_processor = definition_processor
+      @dry = false
+      @verbose = false
     end
 
-    def run(conf_file = user_default_configuration_file)
+    def run(conf_file = Sapristi.user_default_configuration_file)
       ::Sapristi.logger.info "Sapristi: Processing: #{conf_file}"
       check_user_configuration(conf_file)
 
@@ -16,13 +18,17 @@ module Sapristi
       process definitions
     end
 
+    attr_reader :verbose, :dry
+
     def verbose!
+      @verbose = true
       ::Sapristi.logger.level = :info
     end
 
     def dry!
       @dry = true
-      ::Sapristi.logger.level = :info if ::Sapristi.logger.level > Logger::INFO
+      logger = ::Sapristi.logger
+      logger.level = :info if logger.level > Logger::INFO
     end
 
     private
@@ -37,12 +43,12 @@ module Sapristi
     end
 
     def check_user_configuration(conf_file)
-      if conf_file.eql?(user_default_configuration_file) && !File.exist?(conf_file)
+      if conf_file.eql?(Sapristi.user_default_configuration_file) && !File.exist?(conf_file)
         @configuration_loader.create_empty_configuration conf_file
       end
     end
 
-    def user_default_configuration_file
+    def self.user_default_configuration_file
       File.join Dir.home, '.sapristi.csv'
     end
   end

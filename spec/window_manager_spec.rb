@@ -31,7 +31,6 @@ module Sapristi
 
       it('can resize windows') do
         subject.resize(window, expected_width, expected_height)
-        sleep 0.5
 
         expect(window_geometry[2..3]).to eq([expected_width, expected_height])
       end
@@ -43,24 +42,23 @@ module Sapristi
 
       it('can move windows') do
         subject.move(window, x_pos, y_pos)
-        sleep 0.6
 
         expect(window_geometry[0..1]).to eq([x_pos, y_pos])
       end
 
       it('when moving reads size from the system not the window') do
         subject.resize(window, expected_width, expected_height)
-        sleep 0.6
 
         subject.move(window, x_pos, y_pos)
+
         expect(window_geometry).to eq([x_pos, y_pos, expected_width, expected_height])
       end
 
       it('when resizing reads position from the system not the window') do
         subject.move(window, x_pos, y_pos)
-        sleep 0.6
 
         subject.resize(window, expected_width, expected_height)
+
         expect(window_geometry).to eq([x_pos, y_pos, expected_width, expected_height])
       end
     end

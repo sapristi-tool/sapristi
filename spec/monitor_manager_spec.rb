@@ -51,7 +51,7 @@ module Sapristi
       before(:each) do
         allow_any_instance_of(LinuxXrandrAdapter).to receive(:list_monitors).and_return(xrandr_example)
         allow_any_instance_of(LinuxXrandrAdapter)
-          .to receive(:get_monitors_work_area).and_return(0 => work_area, 1 => work_area)
+          .to receive(:monitors_work_area).and_return(0 => work_area, 1 => work_area)
       end
 
       it 'a monitor' do

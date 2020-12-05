@@ -11,7 +11,8 @@ module Sapristi
       it('launches command when window title not specified') do
         window_manager = spy('window_manager')
 
-        DefinitionProcessor.new(window_manager).process_definition({ 'Command' => command })
+        definition = build(:a_valid_definition, attrs: { 'Command' => command, 'Title' => nil })
+        DefinitionProcessor.new(window_manager).process_definition(definition)
 
         expect(window_manager).to have_received(:launch).with(command)
       end
@@ -21,15 +22,17 @@ module Sapristi
         window = double('window', pid: 1, title: 'title')
         allow(window_manager).to receive(:find_window).with(/Klondike/).and_return([window])
 
-        DefinitionProcessor.new(window_manager).process_definition({ 'Title' => 'Klondike', 'Command' => command })
+        definition = build(:a_valid_definition, attrs: { 'Command' => command, 'Title' => 'Klondike' })
+        DefinitionProcessor.new(window_manager).process_definition(definition)
 
-        expect(window_manager).to have_received(:move_resize).with(window, nil, nil, nil, nil)
+        expect(window_manager).to have_received(:move_resize).with(window, any_args)
       end
 
       context('raises an error') do
         it('when window with title is not present and command not supplied') do
           expect do
-            subject.process_definition({ 'Title' => 'non existing window title', 'Command' => nil })
+            definition = build(:a_valid_definition, attrs: { 'Command' => nil, 'Title' => 'non existing window title' })
+            subject.process_definition(definition)
           end.to raise_error Error, "Couldn't produce a window for this definition"
         end
 
@@ -40,7 +43,8 @@ module Sapristi
 
           duplicated_title = /Klondike/
           expect do
-            subject.process_definition({ 'Title' => duplicated_title, 'Command' => nil })
+            definition = build(:a_valid_definition, attrs: { 'Command' => nil, 'Title' => duplicated_title })
+            subject.process_definition(definition)
           end.to raise_error Error, "2 windows have the same title: #{duplicated_title}"
         ensure
           window_manager.close(a_window) if a_window
@@ -64,8 +68,8 @@ module Sapristi
       let(:size_y) { 4 }
 
       let(:definition) do
-        { 'Command' => command, 'X-position' => x_position, 'Y-position' => y_position,
-          'H-size' => size_x, 'V-size' => size_y }
+        Definition.new({ 'Command' => command, 'X-position' => x_position, 'Y-position' => y_position,
+          'H-size' => size_x, 'V-size' => size_y })
       end
 
       it 'move and resize window' do

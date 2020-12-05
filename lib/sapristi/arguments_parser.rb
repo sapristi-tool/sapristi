@@ -5,11 +5,13 @@ require 'ostruct'
 
 module Sapristi
   class ArgumentsParser
-    def parse(options)
-      args = OpenStruct.new
+    def initialize
+      @args = OpenStruct.new
+    end
 
-      ArgumentsParser.build_parser(args).parse!(options)
-      args
+    def parse(options)
+      ArgumentsParser.build_parser(@args).parse!(options)
+      @args
     end
 
     def self.build_parser(args)

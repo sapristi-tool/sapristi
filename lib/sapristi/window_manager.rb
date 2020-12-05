@@ -51,26 +51,17 @@ module Sapristi
     GRAVITY = 0
     TIME_TO_APPLY_DIMENSIONS = 0.5
     def move_resize(window, x_position, y_position, width, height)
-      @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
-      sleep TIME_TO_APPLY_DIMENSIONS
-      expected = [x_position, y_position, width, height]
-      check_expected_geometry window, expected
+      call_move_resize(window, x_position, y_position, width, height)
     end
 
     def resize(window, width, height)
       x_position, y_position = @display.windows(id: window.id).first.geometry
-      @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
-      sleep TIME_TO_APPLY_DIMENSIONS
-      expected = [x_position, y_position, width, height]
-      check_expected_geometry window, expected
+      call_move_resize(window, x_position, y_position, width, height)
     end
 
     def move(window, x_position, y_position)
       width, height = @display.windows(id: window.id).first.geometry[2..3]
-      @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
-      sleep TIME_TO_APPLY_DIMENSIONS
-      expected = [x_position, y_position, width, height]
-      check_expected_geometry window, expected
+      call_move_resize(window, x_position, y_position, width, height)
     end
 
     def workspaces
@@ -78,6 +69,13 @@ module Sapristi
     end
 
     private
+
+    def call_move_resize(window, x_position, y_position, width, height)
+      @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
+      sleep TIME_TO_APPLY_DIMENSIONS
+      expected = [x_position, y_position, width, height]
+      check_expected_geometry window, expected
+    end
 
     def execute_and_detach(cmd)
       process_pid = begin
@@ -89,22 +87,29 @@ module Sapristi
       Process.detach process_pid
     end
 
+    LABELS = %w[x y width heigth].freeze
+
     def check_expected_geometry(window, expected)
       actual = @display.windows(id: window.id).first.geometry
 
-      diffs = 4.times.filter { |i| !expected[i].eql? actual[i] }
-      labels = %w[x y width heigh]
-      txt = diffs.map { |i| "#{labels[i]}: expected=#{expected[i]}, actual=#{actual[i]}" }.join(', ')
-
-      ::Sapristi.logger.warn "Geometry mismatch #{txt}, requested=#{expected}" unless actual.eql? expected
+      unless actual.eql? expected
+        ::Sapristi.logger.warn "Geometry mismatch #{WindowManager.text_diff(actual, expected)}, requested=#{expected}"
+      end
     end
+
+    def self.text_diff(actual, expected)
+      diffs = 4.times.filter { |index| !expected[index].eql? actual[index] }
+      diffs.map { |diff_index| "#{LABELS[diff_index]}: expected=#{expected[diff_index]}, actual=#{actual[diff_index]}" }.join(', ')
+    end
+
+    private_class_method :text_diff
   end
 
   class NewProcessWindowDetector
     def initialize
       @display = WMCtrl.display
       @previous_windows_ids = @display.windows.map { |window| window[:id] }
-      @previous_pids = user_pids
+      @previous_pids = NewProcessWindowDetector.user_pids
     end
 
     attr_reader :previous_windows_ids, :previous_pids
@@ -126,17 +131,19 @@ module Sapristi
 
     private
 
-    def user_pids
+    def self.user_pids
       user_id = `id -u`.strip
       `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i)
     end
 
     def detect_new_windows
-      new_windows = @display.windows.filter do |window|
-        !previous_pids.include?(window.pid) && !previous_windows_ids.include?(window.id)
-      end
+      new_windows = @display.windows.filter { |window| new_window?(window) }
 
       new_windows.each { |window| ::Sapristi.logger.debug "  Found new window=#{window.pid}: #{window.title}" }
+    end
+
+    def new_window?(window)
+      !previous_pids.include?(window.pid) && !previous_windows_ids.include?(window.id)
     end
   end
 end

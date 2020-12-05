@@ -2,57 +2,27 @@
 
 module Sapristi
   class DefinitionParser
-    TRANSLATIONS = {
-      'H-size' => 'work_area_width', 'V-size' => 'work_area_height',
-      'X-position' => 'work_area_width', 'Y-position' => 'work_area_height'
-    }.freeze
-    NUMERIC_FIELDS = (TRANSLATIONS.keys + %w[Workspace Monitor]).freeze
-    NORMALIZED_FIELD_SUFFIX = '_raw'
-
     def initialize
       @monitor_manager = MonitorManager.new
       @window_manager = WindowManager.new
     end
 
-    def parse(definition)
-      validate_raw(definition)
+    def parse(definition_hash)
+      definition = Definition.new(definition_hash)
 
-      monitor = @monitor_manager.get_monitor definition['Monitor']
-
-      normalized = normalize definition, monitor
-      validate_normalized normalized, monitor
+      normalized = definition
+      validate_normalized normalized
       normalized
     end
 
     private
 
-    def normalize(definition, monitor)
-      normalized = definition.to_h.keys.each_with_object({}) do |key, memo|
-        normalize_key(key, definition[key], memo, monitor)
-      end
-
-      NUMERIC_FIELDS
-        .filter { |field| normalized[field] }
-        .each { |field| normalized[field] = normalized[field].to_i }
-      normalized['Workspace'] ||= @window_manager.workspaces.find(&:current).id
-
-      normalized
-    end
-
-    def validate_raw(definition)
-      raise Error, 'No command or window title specified' if definition['Command'].nil? && definition['Title'].nil?
-
-      geometry_field_nil = %w[H-size V-size X-position Y-position].find { |key| definition[key].nil? }
-      raise Error, "No #{geometry_field_nil} specified" if geometry_field_nil
-
-      raise Error, 'Invalid monitor=-1' if definition['Monitor']&.to_i&.negative?
-    end
-
-    def validate_normalized(normalized, monitor)
-      x_pos = normalized['X-position']
-      y_pos = normalized['Y-position']
-      window_width = normalized['H-size']
-      window_height = normalized['V-size']
+    def validate_normalized(normalized)
+      monitor = normalized.monitor
+      x_pos = normalized.x_position
+      y_pos = normalized.y_position
+      window_width = normalized.h_size
+      window_height = normalized.v_size
       x_end = x_pos + window_width
       y_end = y_pos + window_height
       work_area_width = monitor['work_area_width']
@@ -61,10 +31,9 @@ module Sapristi
       monitor_height = monitor['y']
       min_x_size = 50
       min_y_size = 50
-      workspace = normalized['Workspace']
+      workspace = normalized.workspace
       workspaces_number = @window_manager.workspaces.size
       workspaces = 0..(workspaces_number - 1)
-
       unless (0...monitor_width).include? x_pos
         raise Error, "x=#{x_pos} is outside of monitor width dimension=0..#{monitor_width - 1}"
       end
@@ -81,42 +50,6 @@ module Sapristi
       raise Error, "window y size=#{window_height} less than #{min_y_size}" if window_height < min_y_size
 
       raise Error, "invalid workspace=#{workspace} valid=#{workspaces}" unless workspaces.include? workspace
-    end
-
-    def normalize_key(key, raw, memo, monitor)
-      is_percentage = raw&.to_s&.match(/^([0-9]+)%$/)
-
-      if is_percentage
-        memo[key] = apply_percentage(key, raw, monitor)
-        memo[key + NORMALIZED_FIELD_SUFFIX] = raw
-        memo[key] += monitor['work_area'][0] if key.eql? 'X-position'
-        memo[key] += monitor['work_area'][1] if key.eql? 'Y-position'
-      elsif raw.to_s.include?('%')
-        raise Error, "key=#{key}, invalid percentage=#{raw}"
-      else
-        memo[key] = raw
-      end
-    end
-
-    def apply_percentage(key, raw, monitor)
-      validate_percentage_field(key, raw)
-
-      value = raw.to_s.match(/^([0-9]+)%$/)[1].to_i
-      percentage = value / 100.0
-      monitor_absolute = monitor[TRANSLATIONS[key]]
-
-      (monitor_absolute * percentage).to_i
-    end
-
-    def validate_percentage_field(key, raw)
-      translated_key = TRANSLATIONS[key]
-      min_percentage = { 'V-size' => 5, 'H-size' => 5 }.fetch(key, 0)
-      unless translated_key
-        raise "#{key}=#{raw}, using percentage in invalid field, valid=#{TRANSLATIONS.keys.join(', ')}"
-      end
-
-      value = raw.to_s.match(/^([0-9]+)%$/)[1].to_i
-      raise Error, "#{key} percentage is invalid=#{raw}, valid=5%-100%" if value < min_percentage || value > 100
     end
   end
 end

@@ -7,11 +7,16 @@ module Sapristi
     end
 
     def process_definition(definition)
-      window = get_window definition['Title'], definition['Command']
+      title = definition.title
+      command = definition.command
+      x_position = definition.x_position
+      y_position = definition.y_position
+      width = definition.h_size
+      height = definition.v_size
 
-      @window_manager.move_resize(window,
-                                  definition['X-position'], definition['Y-position'],
-                                  definition['H-size'], definition['V-size'])
+      window = get_window title, command
+
+      @window_manager.move_resize(window, x_position, y_position, width, height)
     end
 
     private

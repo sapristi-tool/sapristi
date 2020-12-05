@@ -53,16 +53,16 @@ module Sapristi
           expect { subject.run ['-f', invalid_file] }.to output(/#{invalid_file}/).to_stderr
         end
 
+        def create_valid_file_one_line(values)
+          definition = build :valid_hash, attrs: values
+          build(:valid_csv_file_path, rows: [definition])
+        end
+
         it 'output line number if available' do
-          file = Tempfile.create('foo')
-          file.write
-          file.write(valid_headers.join(separator))
-          file.write "\n"
-          file.write(valid_headers.map { |_a| '' }.join(separator))
-          file.close
+          file = create_valid_file_one_line('Command' => nil, 'Title' => nil)
 
           allow_any_instance_of(Kernel).to receive(:exit).and_return(1)
-          expect { subject.run ['-f', file.path] }.to output(/.+, line=0/).to_stderr
+          expect { subject.run ['-f', file] }.to output(/.+, line=0/).to_stderr
         end
 
         it 'return 1 status' do
@@ -75,38 +75,53 @@ module Sapristi
       end
 
       context('unexpected errors') do
-        it 'says there is been an error' do
-          expect_any_instance_of(Sapristi).to receive(:run).and_raise(ArgumentError, 'some')
+        let(:expected_error) { ArgumentError.new('some') }
+        before(:each) do
+          expect_any_instance_of(Sapristi).to receive(:run).and_raise(expected_error)
+          allow($stderr).to receive(:puts)
+        end
 
+        it 'says there is been an error' do
           allow_any_instance_of(Kernel).to receive(:exit).and_return(1)
           expect { subject.run [] }.to output(%r{Sapristi crashed, see /tmp/sapristi.stacktrace.[0-9]+.log}).to_stderr
         end
 
         it 'generates a crash file in tmp with the stack trace' do
-          expect_any_instance_of(Sapristi).to receive(:run).and_raise(ArgumentError, 'some')
+          allow(subject).to receive(:exit_error)
+          allow(subject).to receive(:save_stacktrace)
 
-          allow($stderr).to receive(:puts)
-          expect { subject.run [] }.to raise_error(SystemExit) do |error|
-            expect(error.status).to eq(2)
+          subject.run []
 
-            expect($stderr).to have_received(:puts).with(lambda { |args|
-              error_file = args.match(%r{(/tmp.+)$})[1]
-              stacktrace = File.readlines(error_file).map(&:chomp)
-
-              expect(stacktrace[0]).to eq("#{ArgumentError}: some")
-              expect(stacktrace[1..-1].size).to be > 2
-            })
-          end
+          expect(subject).to have_received(:save_stacktrace).with(expected_error)
         end
 
         it 'return 2 status' do
-          expect_any_instance_of(Sapristi).to receive(:run).and_raise(ArgumentError, 'some')
+          allow(subject).to receive(:exit_error)
+          subject.run []
 
+          expect(subject).to have_received(:exit_error).with(2, any_args)
+        end
+
+        it 'exit_error raises SystemExit with code and error message' do
           expect { subject.run [] }.to raise_error(SystemExit) do |error|
             expect(error.status).to eq(2)
+            error_regex = %r{Sapristi crashed, see /tmp/.+}
+
+            validate_error_mesage error_regex
           end
+        end
+
+        def validate_error_mesage(error_regex)
+          expect($stderr).to have_received(:puts)
+            .with(->(error_line) { expect(error_line).to match(error_regex) })
         end
       end
     end
+  end
+end
+
+module Helper
+  def self.read_stacktrace(error_file)
+    File.readlines(error_file).map(&:chomp)
   end
 end
