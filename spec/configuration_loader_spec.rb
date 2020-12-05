@@ -59,11 +59,6 @@ RSpec.describe ConfigurationLoader do
 
         let(:monitor_width) { 1024 }
         let(:monitor_height) { 480 }
-        let(:xrandr_example) do
-          %(Monitors: 2
- 0: +*monitor1 #{monitor_width}/597x#{monitor_height}/336+0+0  DP-1
- 1: +monitor2 1920/509x1080/286+3840+0  HDMI-1)
-        end
 
         let(:workspaces) do
           [

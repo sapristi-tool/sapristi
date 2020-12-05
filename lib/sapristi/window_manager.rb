@@ -37,30 +37,25 @@ module Sapristi
 
       process_window = window_detector.detect_window_for_process(waiter, timeout_in_seconds)
 
-      if process_window.nil?
-        Process.kill 'KILL', waiter.pid
-        # sleep 1 # XLIB error for op code
-        raise Error, "Error executing process, it didn't open a window"
-      end
+      kill waiter unless process_window
 
-      ::Sapristi.logger.info "  Found window title=#{process_window.title} for process=#{waiter.pid}!"
       process_window
     end
 
     GRAVITY = 0
     TIME_TO_APPLY_DIMENSIONS = 0.5
     def move_resize(window, x_position, y_position, width, height)
-      call_move_resize(window, x_position, y_position, width, height)
+      call_move_resize(window, [x_position, y_position, width, height])
     end
 
     def resize(window, width, height)
       x_position, y_position = @display.windows(id: window.id).first.geometry
-      call_move_resize(window, x_position, y_position, width, height)
+      call_move_resize(window, [x_position, y_position, width, height])
     end
 
     def move(window, x_position, y_position)
       width, height = @display.windows(id: window.id).first.geometry[2..3]
-      call_move_resize(window, x_position, y_position, width, height)
+      call_move_resize(window, [x_position, y_position, width, height])
     end
 
     def workspaces
@@ -69,11 +64,16 @@ module Sapristi
 
     private
 
-    def call_move_resize(window, x_position, y_position, width, height)
-      @display.action_window(window.id, :move_resize, GRAVITY, x_position, y_position, width, height)
+    def kill(waiter)
+      Process.kill 'KILL', waiter.pid
+      # sleep 1 # XLIB error for op code
+      raise Error, 'Error executing process, it didn\'t open a window'
+    end
+
+    def call_move_resize(window, geometry)
+      @display.action_window(window.id, :move_resize, GRAVITY, *geometry)
       sleep TIME_TO_APPLY_DIMENSIONS
-      expected = [x_position, y_position, width, height]
-      check_expected_geometry window, expected
+      check_expected_geometry window, geometry
     end
 
     def execute_and_detach(cmd)

@@ -10,22 +10,27 @@ module Sapristi
 
     attr_reader :previous_windows_ids, :previous_pids
 
-    def detect_window_for_process(waiter, timeout_in_seconds)
-      start_time = Time.now
-      while Time.now - start_time < timeout_in_seconds && waiter.alive?
-        process_window = detect_new_windows.find { |window| window.pid.eql? waiter.pid }
+    def detect_window_for_process(waiter, timeout_in_seconds)      
+      process_window = wait_for_window(waiter, timeout_in_seconds)
 
-        break if process_window
-
-        sleep 0.5
-      end
-
-      raise Error, 'Error executing process, is dead' unless waiter.alive?
+      ::Sapristi.logger.info "  Found window title=#{process_window.title} for process=#{waiter.pid}!" if process_window
 
       process_window
     end
 
     private
+
+    def wait_for_window(waiter, timeout_in_seconds)
+      start_time = Time.now
+      while Time.now - start_time < timeout_in_seconds && waiter.alive?
+        process_window = detect_new_windows.find { |window| window.pid.eql? waiter.pid }
+
+        return process_window if process_window
+
+        sleep 0.5
+      end
+      raise Error, 'Error executing process, is dead' unless waiter.alive?
+    end
 
     def self.user_pids
       user_id = `id -u`.strip

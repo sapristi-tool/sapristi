@@ -33,9 +33,7 @@ module Sapristi
     end
 
     xit 'process lines in configuration file' do
-      definition = { 'Title' => nil, 'Command' => 'sol', 'Monitor' => nil,
-                     'X-position' => 0, 'Y-position' => 0, 'H-size' => 500, 'V-size' => 500, 'Workspace' => 0 }
-
+      definition = build(:a_valid_definition)
       file = Tempfile.create 'foo'
       file_path = file.path
       file.close
@@ -50,8 +48,7 @@ module Sapristi
     end
 
     xit 'appends line number to error when processing file' do
-      definition = { 'Title' => nil, 'Command' => '', 'Monitor' => nil, 'X-position' => 0,
-                     'Y-position' => 0, 'H-size' => 500, 'V-size' => 500, 'Workspace' => nil }
+      definition = build(:valid_hash, attrs: { 'Command' => nil, 'Title' => nil })
 
       file = Tempfile.create 'foo'
       file_path = file.path
