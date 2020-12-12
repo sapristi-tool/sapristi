@@ -2,8 +2,8 @@
 
 module Sapristi
   FactoryBot.define do
-    factory :valid_csv_definitions, class: Array do
-      rows do
+    factory :valid_definition_hashes, class: Array do
+      initialize_with do
         [
           {
             'Title' => nil, 'Command' => 'some', 'Monitor' => nil, 'X-position' => 1,
@@ -17,10 +17,13 @@ module Sapristi
             'Title' => 'some title', 'Command' => nil, 'Monitor' => 0, 'X-position' => '10%',
             'Y-position' => '20%', 'H-size' => '30%', 'V-size' => '40%', 'Workspace' => nil
           }
-        ].map { |definition| Definition.new definition }
+        ]
       end
+    end
+    factory :valid_csv_definitions, class: Array do
+      rows { build(:valid_definition_hashes) }
 
-      initialize_with { rows }
+      initialize_with { rows.map { |definition| Definition.new definition } }
     end
 
     factory :a_valid_definition, class: Definition do

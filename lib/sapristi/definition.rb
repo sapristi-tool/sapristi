@@ -22,8 +22,7 @@ module Sapristi
         raw = definition_hash[variable]
         # value = normalize variable, raw
         normalized_value = AttributeNormalizer.new(variable, raw, the_monitor).normalize
-        instance_variable_set "@#{Definition.normalize_key variable}".to_sym, normalized_value
-        @to_h[variable] = normalized_value
+        self[variable] = normalized_value
       end
 
       NUMERIC_FIELDS.each { |field| self[field] = self[field].to_i if self[field] }
@@ -31,13 +30,13 @@ module Sapristi
       self['Workspace'] ||= WindowManager.new.workspaces.find(&:current).id
     end
 
-    def raw(field)
-      @raw[field]
-    end
+    #def raw(field)
+    #  @raw[field]
+    #end
 
-    def raw_key?(field)
-      @raw.key?(field)
-    end
+    #def raw_key?(field)
+    #  @raw.key?(field)
+    #end
 
     attr_reader :monitor, :x_position, :y_position, :v_size, :h_size, :workspace, :command, :title
 
@@ -46,12 +45,7 @@ module Sapristi
       @to_h[key]
     end
 
-    def []=(key, value)
-      @to_h[key] = value
-      instance_variable_set "@#{Definition.normalize_key key}".to_sym, value
-    end
-
-    def to_h
+    def raw_definition
       @raw
     end
     # scaffolding
@@ -61,6 +55,11 @@ module Sapristi
     end
 
     private
+
+    def []=(key, value)
+      @to_h[key] = value
+      instance_variable_set "@#{Definition.normalize_key key}".to_sym, value
+    end
 
     def validate(definition)
       raise Error, 'No command or window title specified' if definition['Command'].nil? && definition['Title'].nil?

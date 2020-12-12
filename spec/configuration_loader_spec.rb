@@ -23,7 +23,7 @@ RSpec.describe ConfigurationLoader do
 
   let(:valid_headers) { %w[Title Command Monitor X-position Y-position H-size V-size Workspace] }
   let(:valid_csv) do
-    build(:valid_csv_file_path, rows: valid_csv_definitions)
+    build(:valid_csv_file_path, rows: build(:valid_definition_hashes))
   end
 
   let(:valid_csv_definitions) do
