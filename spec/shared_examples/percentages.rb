@@ -15,8 +15,8 @@ module Sapristi
     it "when #{field} percentage x < #{min_percentage}" do
       if min_percentage.positive?
         raw = "#{min_percentage - 1}%"
-        file = create_valid_file_one_line(field => raw)
-        expect { subject.load file }
+        definition_attrs = build(:valid_hash, attrs: { field => raw })
+        expect { subject.parse definition_attrs }
           .to raise_error(Error, /#{field} percentage is invalid=#{raw}, valid=#{min_percentage}%-100%/)
       end
     end

@@ -101,6 +101,6 @@ module Sapristi
       diffs.map { |diff_index| "#{LABELS[diff_index]}: expected=#{expected[diff_index]}, actual=#{actual[diff_index]}" }.join(', ')
     end
 
-    #private_class_method :text_diff
+    # private_class_method :text_diff
   end
 end

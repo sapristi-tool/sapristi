@@ -10,7 +10,7 @@ module Sapristi
 
     attr_reader :previous_windows_ids, :previous_pids
 
-    def detect_window_for_process(waiter, timeout_in_seconds)      
+    def detect_window_for_process(waiter, timeout_in_seconds)
       process_window = wait_for_window(waiter, timeout_in_seconds)
 
       ::Sapristi.logger.info "  Found window title=#{process_window.title} for process=#{waiter.pid}!" if process_window
