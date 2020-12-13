@@ -62,10 +62,5 @@ module Sapristi
       raise Error, "window x size=#{window_width} less than #{MIN_X_SIZE}" if window_width < MIN_X_SIZE
       raise Error, "window y size=#{window_height} less than #{MIN_Y_SIZE}" if window_height < MIN_Y_SIZE
     end
-
-    def workspaces
-      workspaces_number = @window_manager.workspaces.size
-      0..(workspaces_number - 1)
-    end
   end
 end

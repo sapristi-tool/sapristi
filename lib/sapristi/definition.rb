@@ -22,17 +22,14 @@ module Sapristi
     private
 
     def normalize_variables
-      %w[Title Command X-position Y-position H-size V-size].each do |variable|
-        value = AttributeNormalizer.new(variable, @raw_definition[variable], @monitor).normalize
-        instance_variable_set "@#{Definition.normalize_key variable}".to_sym, value
+      %w[Title Command X-position Y-position H-size V-size].each do |key|
+        name = key.downcase.gsub(/-/, '_')
+        value = AttributeNormalizer.new(key, @raw_definition[key], @monitor).normalize
+        instance_variable_set "@#{name}".to_sym, value
       end
     end
 
-    def self.normalize_key(key)
-      key.downcase.gsub(/-/, '_')
-    end
-
-    def validate_raw definition
+    def validate_raw(definition)
       raise Error, 'No command or window title specified' if definition['Command'].nil? && definition['Title'].nil?
 
       geometry_field_nil = %w[H-size V-size X-position Y-position].find { |key| definition[key].nil? }
