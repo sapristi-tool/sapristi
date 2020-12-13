@@ -25,40 +25,44 @@ module Sapristi
         self[variable] = normalized_value
       end
 
-      NUMERIC_FIELDS.each { |field| self[field] = self[field].to_i if self[field] }
+      #NUMERIC_FIELDS.each { |field| self[field] = self[field].to_i if self[field] }
+      NUMERIC_FIELDS.each do |key|
+        field = Definition.normalize_key(key)
+        value = send(field)
+        #send("#{field}=", value.to_i) if value
+        #self[field] = value.to_i if value
+        #require "pry";binding.pry
+        if value
+          @to_h[key] = value.to_i
+          instance_variable_set "@#{field}".to_sym, value.to_i
+        end
+      end
 
-      self['Workspace'] ||= WindowManager.new.workspaces.find(&:current).id
+      self['Workspace'] = self.workspace || WindowManager.new.workspaces.find(&:current).id
     end
-
-    #def raw(field)
-    #  @raw[field]
-    #end
-
-    #def raw_key?(field)
-    #  @raw.key?(field)
-    #end
 
     attr_reader :monitor, :x_position, :y_position, :v_size, :h_size, :workspace, :command, :title
-
-    # scaffolding
-    def [](key)
-      @to_h[key]
-    end
 
     def raw_definition
       @raw
     end
-    # scaffolding
 
-    def self.normalize_key(key)
-      key.downcase.gsub(/-/, '_')
-    end
+    # scaffolding
+    #def [](key)
+    #  @to_h[key]
+    #end
+
+    # scaffolding
 
     private
 
     def []=(key, value)
       @to_h[key] = value
       instance_variable_set "@#{Definition.normalize_key key}".to_sym, value
+    end
+
+    def self.normalize_key(key)
+      key.downcase.gsub(/-/, '_')
     end
 
     def validate(definition)

@@ -168,7 +168,7 @@ RSpec.describe DefinitionParser do
 
     it 'when workspace is not specified use current' do
       definition_attrs = build(:valid_hash, attrs: { 'Workspace' => nil })
-      expect(subject.parse(definition_attrs)['Workspace']).to eq(current_workspace_id)
+      expect(subject.parse(definition_attrs).workspace ).to eq(current_workspace_id)
     end
   end
 end
