@@ -100,7 +100,7 @@ RSpec.describe ConfigurationLoader do
 
     it 'numeric fields are integers' do
       %w[x_position y_position h_size v_size workspace].each do |field|
-        expect(content[1].send field).to be_instance_of Integer
+        expect(content[1].send(field)).to be_instance_of Integer
       end
     end
   end

@@ -62,7 +62,20 @@ module Sapristi
       @display.desktops
     end
 
+    def find_workspace_or_current(id)
+      return workspaces.find(&:current).id unless id
+
+      return id if workspace?(id)
+
+      available = 0..(workspaces.size - 1)
+      raise Error, "invalid workspace=#{id} valid=#{available}" unless available.include? id
+    end
+
     private
+
+    def workspace?(id)
+      workspaces.find { |workspace| workspace.id.eql? id }
+    end
 
     def kill(waiter)
       Process.kill 'KILL', waiter.pid

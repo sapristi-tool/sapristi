@@ -19,7 +19,6 @@ module Sapristi
     def validate(definition)
       validate_monitor(definition)
       validate_window_min_size(definition)
-      validate_workspace(definition)
     end
 
     def validate_monitor(definition)
@@ -62,11 +61,6 @@ module Sapristi
       window_height = normalized.v_size
       raise Error, "window x size=#{window_width} less than #{MIN_X_SIZE}" if window_width < MIN_X_SIZE
       raise Error, "window y size=#{window_height} less than #{MIN_Y_SIZE}" if window_height < MIN_Y_SIZE
-    end
-
-    def validate_workspace(definition)
-      workspace = definition.workspace
-      raise Error, "invalid workspace=#{workspace} valid=#{workspaces}" unless workspaces.include? workspace
     end
 
     def workspaces

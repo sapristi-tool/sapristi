@@ -13,8 +13,8 @@ module Sapristi
       validate_raw
 
       @monitor = MonitorManager.new.get_monitor_or_main definition_hash['Monitor']
+      @workspace = WindowManager.new.find_workspace_or_current definition_hash['Workspace']&.to_i
       normalize_variables
-      @workspace ||= WindowManager.new.workspaces.find(&:current).id # FIXME: find_or_current
     end
 
     attr_reader :raw_definition, :monitor, :x_position, :y_position, :v_size, :h_size, :workspace, :command, :title
@@ -22,7 +22,7 @@ module Sapristi
     private
 
     def normalize_variables
-      %w[Title Command X-position Y-position H-size V-size Workspace].each do |variable|
+      %w[Title Command X-position Y-position H-size V-size].each do |variable|
         raw = @raw_definition[variable]
 
         normalized_value = AttributeNormalizer.new(variable, raw, @monitor).normalize
