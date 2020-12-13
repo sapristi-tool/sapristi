@@ -12,6 +12,7 @@ require 'sapristi/sapristi'
 require 'sapristi/arguments_parser'
 require 'sapristi/linux_xrandr_adapter'
 require 'sapristi/new_process_window_detector'
+require 'sapristi/monitor'
 require 'logger'
 
 module Sapristi
