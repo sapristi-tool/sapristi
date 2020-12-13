@@ -28,7 +28,7 @@ module Sapristi
     def extract_monitor_info(line)
       monitor_info = LinuxXrandrAdapter.parse_line line
 
-      monitor_info.merge work_area(monitor_info)
+      Monitor.new monitor_info.merge work_area(monitor_info)
     end
 
     public
@@ -67,6 +67,34 @@ module Sapristi
       @screen.n_monitors.times.each_with_object({}) do |monitor_id, memo|
         memo[monitor_id] = @screen.get_monitor_workarea(monitor_id)
       end
+    end
+  end
+
+  class Monitor
+    def initialize(data)
+      data.each { |key, value| instance_variable_set "@#{key}".to_sym, value }
+    end
+
+    def [](key)
+      instance_variable_get "@#{key}"
+    end
+
+    attr_reader :id, :main, :name, :x, :y, :offset_x, :offset_y, :work_area, :work_area_width, :work_area_height
+
+    def hash
+      state.hash
+    end
+
+    def ==(other)
+      other.class == self.class && state == other.state
+    end
+
+    alias_method :eql?, :==
+
+    protected
+
+    def state
+      [@id, @main, @name, @x, @y, @offset_x, @offset_y, @work_area, @work_area_width, @work_area_height]
     end
   end
 end

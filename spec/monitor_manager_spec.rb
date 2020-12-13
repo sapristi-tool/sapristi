@@ -9,15 +9,15 @@ module Sapristi
     let(:a_monitor_name) { 'DP-1' }
     let(:another_monitor_name) { 'HDMI-1' }
     let(:a_monitor) do
-      { id: 0, name: a_monitor_name, main: '*', x: 3840, y: 2160,
+      Monitor.new({ id: 0, name: a_monitor_name, main: '*', x: 3840, y: 2160,
         offset_x: 0, offset_y: 0,
-        work_area: [100, 200, 400, 600], work_area_height: 400, work_area_width: 300 }.transform_keys(&:to_s)
+        work_area: [100, 200, 400, 600], work_area_height: 400, work_area_width: 300 }.transform_keys(&:to_s))
     end
     let(:main_monitor) { a_monitor }
     let(:another_monitor_offset_x) { 3840 }
     let(:another_monitor_offset_y) { 2000 }
     let(:another_monitor) do
-      { id: 1,
+      Monitor.new({ id: 1,
         name: another_monitor_name, main: nil,
         x: 1920, y: 1080,
         offset_x: another_monitor_offset_x, offset_y: another_monitor_offset_y,
@@ -28,7 +28,7 @@ module Sapristi
           work_area.y + work_area.height - another_monitor_offset_y
         ],
         work_area_height: work_area.height,
-        work_area_width: work_area.width }.transform_keys(&:to_s)
+        work_area_width: work_area.width }.transform_keys(&:to_s))
     end
     let(:xrandr_example) do
       %(Monitors: 2

@@ -5,10 +5,12 @@ module Sapristi
     def initialize(key, raw, monitor)
       @key = key
       @raw = raw
-      @monitor_absolute = monitor[Definition::TRANSLATIONS[key]]
-      work_area = monitor['work_area']
-      @work_area_x_offset = work_area[0]
-      @work_area_y_offset = work_area[1]
+      if Definition::TRANSLATIONS[key]
+        @monitor_absolute = monitor[Definition::TRANSLATIONS[key]]
+        work_area = monitor['work_area']
+        @work_area_x_offset = work_area[0]
+        @work_area_y_offset = work_area[1]
+      end
     end
 
     def normalize
