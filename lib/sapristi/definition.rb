@@ -9,8 +9,8 @@ module Sapristi
     NUMERIC_FIELDS = (TRANSLATIONS.keys + %w[Workspace]).freeze
 
     def initialize(definition_hash)
+      validate_raw definition_hash
       @raw_definition = definition_hash.clone
-      validate_raw
 
       @monitor = MonitorManager.new.get_monitor_or_main definition_hash['Monitor']
       @workspace = WindowManager.new.find_workspace_or_current definition_hash['Workspace']&.to_i
@@ -23,23 +23,16 @@ module Sapristi
 
     def normalize_variables
       %w[Title Command X-position Y-position H-size V-size].each do |variable|
-        raw = @raw_definition[variable]
-
-        normalized_value = AttributeNormalizer.new(variable, raw, @monitor).normalize
-        self[variable] = normalized_value
+        value = AttributeNormalizer.new(variable, @raw_definition[variable], @monitor).normalize
+        instance_variable_set "@#{Definition.normalize_key variable}".to_sym, value
       end
-    end
-
-    def []=(key, value)
-      instance_variable_set "@#{Definition.normalize_key key}".to_sym, value
     end
 
     def self.normalize_key(key)
       key.downcase.gsub(/-/, '_')
     end
 
-    def validate_raw
-      definition = @raw_definition
+    def validate_raw definition
       raise Error, 'No command or window title specified' if definition['Command'].nil? && definition['Title'].nil?
 
       geometry_field_nil = %w[H-size V-size X-position Y-position].find { |key| definition[key].nil? }
