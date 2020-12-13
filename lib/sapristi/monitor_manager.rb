@@ -11,7 +11,7 @@ module Sapristi
       @os_manager = LinuxXrandrAdapter.new
     end
 
-    def get_monitor(name)
+    def get_monitor_or_main(name)
       return monitors[name] if monitor_present?(name)
 
       use_main_monitor name

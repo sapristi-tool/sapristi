@@ -18,6 +18,8 @@ module Sapristi
         apply_percentage
       elsif raw.to_s.include?('%')
         raise Error, "key=#{key}, invalid percentage=#{raw}"
+      elsif Definition::NUMERIC_FIELDS.include?(@key)
+        raw ? raw.to_i : raw
       else
         raw
       end

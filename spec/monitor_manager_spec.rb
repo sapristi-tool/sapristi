@@ -44,10 +44,10 @@ module Sapristi
       allow_any_instance_of(LinuxXrandrAdapter)
         .to(receive(:list_monitors).and_wrap_original { |_m, *_args| `axrandr --listmonitors` })
 
-      expect { subject.get_monitor(nil) }.to raise_error(Error, /Error fetching monitor information/)
+      expect { subject.get_monitor_or_main(nil) }.to raise_error(Error, /Error fetching monitor information/)
     end
 
-    context('#get_monitor') do
+    context('#get_monitor_or_main') do
       before(:each) do
         allow_any_instance_of(LinuxXrandrAdapter).to receive(:list_monitors).and_return(xrandr_example)
         allow_any_instance_of(LinuxXrandrAdapter)
@@ -55,19 +55,19 @@ module Sapristi
       end
 
       it 'a monitor' do
-        expect(subject.get_monitor(a_monitor_name)).to eq(a_monitor)
+        expect(subject.get_monitor_or_main(a_monitor_name)).to eq(a_monitor)
       end
 
       it 'another monitor with offset' do
-        expect(subject.get_monitor(another_monitor_name)).to eq(another_monitor)
+        expect(subject.get_monitor_or_main(another_monitor_name)).to eq(another_monitor)
       end
 
       it 'main monitor when monitor name not found' do
-        expect(subject.get_monitor('none')).to eq(main_monitor)
+        expect(subject.get_monitor_or_main('none')).to eq(main_monitor)
       end
 
       it 'main monitor when monitor name is nil' do
-        expect(subject.get_monitor(nil)).to eq(main_monitor)
+        expect(subject.get_monitor_or_main(nil)).to eq(main_monitor)
       end
     end
   end

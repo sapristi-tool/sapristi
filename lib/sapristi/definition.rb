@@ -9,55 +9,28 @@ module Sapristi
     NUMERIC_FIELDS = (TRANSLATIONS.keys + %w[Workspace]).freeze
 
     def initialize(definition_hash)
-      @raw = definition_hash
-      validate(definition_hash)
-      @to_h = {}
-      @raw = definition_hash.to_h
-      raise Error, 'Invalid monitor=-1' if definition_hash['Monitor']&.to_i&.negative?
+      @raw_definition = definition_hash.clone
+      validate_raw
 
-      the_monitor = MonitorManager.new.get_monitor definition_hash['Monitor']&.to_i
-      self['Monitor'] = the_monitor
-
-      %w[Title Command X-position Y-position H-size V-size Workspace].each do |variable|
-        raw = definition_hash[variable]
-        # value = normalize variable, raw
-        normalized_value = AttributeNormalizer.new(variable, raw, the_monitor).normalize
-        self[variable] = normalized_value
-      end
-
-      #NUMERIC_FIELDS.each { |field| self[field] = self[field].to_i if self[field] }
-      NUMERIC_FIELDS.each do |key|
-        field = Definition.normalize_key(key)
-        value = send(field)
-        #send("#{field}=", value.to_i) if value
-        #self[field] = value.to_i if value
-        #require "pry";binding.pry
-        if value
-          @to_h[key] = value.to_i
-          instance_variable_set "@#{field}".to_sym, value.to_i
-        end
-      end
-
-      self['Workspace'] = self.workspace || WindowManager.new.workspaces.find(&:current).id
+      @monitor = MonitorManager.new.get_monitor_or_main definition_hash['Monitor']
+      normalize_variables
+      @workspace ||= WindowManager.new.workspaces.find(&:current).id # FIXME: find_or_current
     end
 
-    attr_reader :monitor, :x_position, :y_position, :v_size, :h_size, :workspace, :command, :title
-
-    def raw_definition
-      @raw
-    end
-
-    # scaffolding
-    #def [](key)
-    #  @to_h[key]
-    #end
-
-    # scaffolding
+    attr_reader :raw_definition, :monitor, :x_position, :y_position, :v_size, :h_size, :workspace, :command, :title
 
     private
 
+    def normalize_variables
+      %w[Title Command X-position Y-position H-size V-size Workspace].each do |variable|
+        raw = @raw_definition[variable]
+
+        normalized_value = AttributeNormalizer.new(variable, raw, @monitor).normalize
+        self[variable] = normalized_value
+      end
+    end
+
     def []=(key, value)
-      @to_h[key] = value
       instance_variable_set "@#{Definition.normalize_key key}".to_sym, value
     end
 
@@ -65,11 +38,14 @@ module Sapristi
       key.downcase.gsub(/-/, '_')
     end
 
-    def validate(definition)
+    def validate_raw
+      definition = @raw_definition
       raise Error, 'No command or window title specified' if definition['Command'].nil? && definition['Title'].nil?
 
       geometry_field_nil = %w[H-size V-size X-position Y-position].find { |key| definition[key].nil? }
       raise Error, "No #{geometry_field_nil} specified" if geometry_field_nil
+
+      raise Error, 'Invalid monitor=-1' if definition['Monitor']&.to_i&.negative?
     end
   end
 end
