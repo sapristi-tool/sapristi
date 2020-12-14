@@ -5,23 +5,16 @@ module Sapristi
     def initialize(key, raw, monitor)
       @key = key
       @raw = raw
-      if Definition::TRANSLATIONS[key]
-        @monitor_absolute = monitor[Definition::TRANSLATIONS[key]]
-        work_area = monitor['work_area']
-        @work_area_x_offset = work_area[0]
-        @work_area_y_offset = work_area[1]
-      end
+      @monitor = monitor
     end
 
     def normalize
-      is_percentage = raw&.to_s&.match(/^([0-9]+)%$/)
-
-      if is_percentage
+      if percentage?
         apply_percentage
-      elsif raw.to_s.include?('%')
+      elsif not_a_percentage_but_includes_symbol?
         raise Error, "key=#{key}, invalid percentage=#{raw}"
-      elsif Definition::NUMERIC_FIELDS.include?(@key)
-        raw ? raw.to_i : raw
+      elsif numeric_field?
+        raw&.to_i
       else
         raw
       end
@@ -29,16 +22,42 @@ module Sapristi
 
     private
 
-    attr_reader :key, :raw, :monitor_absolute, :work_area_x_offset, :work_area_y_offset
+    attr_reader :key, :raw, :monitor
+
+    def percentage?
+      raw&.to_s&.match(/^([0-9]+)%$/)
+    end
+
+    def not_a_percentage_but_includes_symbol?
+      raw.to_s.include?('%')
+    end
+
+    def numeric_field?
+      Definition::NUMERIC_FIELDS.include?(key)
+    end
 
     def apply_percentage
       validate_percentage_field
 
-      value = (monitor_absolute * percentage).to_i
-      value += work_area_x_offset if key.eql? 'X-position'
-      value += work_area_y_offset if key.eql? 'Y-position'
+      (monitor_absolute * percentage).to_i + offset
+    end
 
-      value
+    def offset
+      work_area = monitor['work_area']
+
+      case key
+      when 'X-position'
+        work_area[0]
+      when 'Y-position'
+        work_area[1]
+      else
+        0
+      end
+    end
+
+    def monitor_absolute
+      translated_key = Definition::TRANSLATIONS[key]
+      monitor[translated_key]
     end
 
     def percentage
@@ -47,9 +66,8 @@ module Sapristi
     end
 
     def validate_percentage_field
-      translated_key = Definition::TRANSLATIONS[key]
       min_percentage = { 'V-size' => 0.05, 'H-size' => 0.05 }.fetch(key, 0)
-      unless translated_key
+      unless Definition::TRANSLATIONS.include? key
         raise "#{key}=#{raw}, using percentage in invalid field, valid=#{Definition::TRANSLATIONS.keys.join(', ')}"
       end
 
