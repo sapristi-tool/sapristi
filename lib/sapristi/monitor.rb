@@ -20,7 +20,7 @@ module Sapristi
       other.class == self.class && state == other.state
     end
 
-    alias_method :eql?, :==
+    alias eql? ==
 
     protected
 
