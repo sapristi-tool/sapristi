@@ -95,7 +95,7 @@ RSpec.describe ConfigurationLoader do
     let(:content) { subject.load(valid_csv) }
 
     before(:each) do
-      allow_any_instance_of(LinuxXrandrAdapter).to receive(:monitors).and_return(main: monitor)
+      allow_any_instance_of(Linux::MonitorManager).to receive(:monitors).and_return(main: monitor)
     end
 
     it 'numeric fields are integers' do

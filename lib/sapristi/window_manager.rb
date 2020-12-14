@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require 'wmctrl'
-
 module Sapristi
   class WindowManager
     def initialize
-      @display = WMCtrl.display
+      @display = Linux::WindowManager.new
     end
 
     def windows
@@ -13,17 +11,7 @@ module Sapristi
     end
 
     def close(window)
-      @display.action_window(window.id, :close)
-
-      #
-      # sleep to allow a Graceful Dead to the window process
-      #
-      # X Error of failed request:  BadWindow (invalid Window parameter)
-      #   Major opcode of failed request:  20 (X_GetProperty)
-      #   Resource id in failed request:  0x2200008
-      #   Serial number of failed request:  1095
-      #   Current serial number in output stream:  1095
-      sleep 1
+      @display.close(window)
     end
 
     def find_window(title_regex)
@@ -42,8 +30,6 @@ module Sapristi
       process_window
     end
 
-    GRAVITY = 0
-    TIME_TO_APPLY_DIMENSIONS = 0.5
     def move_resize(window, x_position, y_position, width, height)
       call_move_resize(window, [x_position, y_position, width, height])
     end
@@ -59,7 +45,7 @@ module Sapristi
     end
 
     def workspaces
-      @display.desktops
+      @display.workspaces
     end
 
     def find_workspace_or_current(id)
@@ -84,8 +70,8 @@ module Sapristi
     end
 
     def call_move_resize(window, geometry)
-      @display.action_window(window.id, :move_resize, GRAVITY, *geometry)
-      sleep TIME_TO_APPLY_DIMENSIONS
+      @display.move_resize(window, geometry)
+
       check_expected_geometry window, geometry
     end
 
@@ -113,7 +99,5 @@ module Sapristi
       diffs = 4.times.filter { |index| !expected[index].eql? actual[index] }
       diffs.map { |diff_index| "#{LABELS[diff_index]}: expected=#{expected[diff_index]}, actual=#{actual[diff_index]}" }.join(', ')
     end
-
-    # private_class_method :text_diff
   end
 end

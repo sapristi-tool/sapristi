@@ -8,7 +8,7 @@ require 'gtk3'
 module Sapristi
   class MonitorManager
     def initialize
-      @os_manager = LinuxXrandrAdapter.new
+      @os_manager = Linux::MonitorManager.new
     end
 
     def get_monitor_or_main(name)
