@@ -170,5 +170,13 @@ RSpec.describe DefinitionParser do
       definition_attrs = build(:valid_hash, attrs: { 'Workspace' => nil })
       expect(subject.parse(definition_attrs).workspace).to eq(current_workspace_id)
     end
+
+    it 'numeric fields are integers' do
+      definition = Definition.new build(:valid_hash)
+
+      %w[x_position y_position h_size v_size workspace].each do |field|
+        expect(definition.send(field)).to be_instance_of Integer
+      end
+    end
   end
 end

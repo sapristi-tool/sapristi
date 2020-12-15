@@ -77,31 +77,16 @@ RSpec.describe ConfigurationLoader do
       end
     end
 
-    xit 'saves definitions' do
+    it 'saves definitions' do
       subject.save file_path, valid_csv_definitions
 
       expect(subject.load(file_path))
-        .to eq(valid_csv_definitions.map { |definition| DefinitionParser.new.parse definition })
+        .to eq(valid_csv_definitions)
     end
 
     it 'writes empty configuration' do
       subject.create_empty_configuration non_existing_file
       expect(File.read(non_existing_file)).to eql subject.valid_headers.join(ConfigurationLoader::SEPARATOR)
-    end
-  end
-
-  context 'configuration file' do
-    let(:monitor) { build(:monitor) }
-    let(:content) { subject.load(valid_csv) }
-
-    before(:each) do
-      allow_any_instance_of(Linux::MonitorManager).to receive(:monitors).and_return(main: monitor)
-    end
-
-    it 'numeric fields are integers' do
-      %w[x_position y_position h_size v_size workspace].each do |field|
-        expect(content[1].send(field)).to be_instance_of Integer
-      end
     end
   end
 end
