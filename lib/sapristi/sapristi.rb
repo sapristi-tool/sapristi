@@ -35,7 +35,7 @@ module Sapristi
 
     def process(definitions)
       definitions.each_with_index do |definition, index|
-        ::Sapristi.logger.info "Process line #{index}: #{definition.inspect}"
+        ::Sapristi.logger.info "Process line #{index}: #{definition}"
         @definition_processor.process_definition(definition) unless @dry
       rescue Error => e
         raise Error, "#{e.message}, line=#{index}"
