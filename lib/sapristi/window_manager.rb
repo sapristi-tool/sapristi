@@ -35,12 +35,14 @@ module Sapristi
     end
 
     def resize(window, width, height)
-      x_position, y_position = @display.windows(id: window.id).first.geometry
+      actual_window = @display.windows(id: window.id).first
+      x_position, y_position = (actual_window.exterior_frame || actual_window.geometry)[0..1]
       call_move_resize(window, [x_position, y_position, width, height])
     end
 
     def move(window, x_position, y_position)
-      width, height = @display.windows(id: window.id).first.geometry[2..3]
+      actual_window = @display.windows(id: window.id).first
+      width, height = (actual_window.exterior_frame || actual_window.geometry)[2..3]
       call_move_resize(window, [x_position, y_position, width, height])
     end
 
@@ -69,10 +71,15 @@ module Sapristi
       raise Error, 'Error executing process, it didn\'t open a window'
     end
 
-    def call_move_resize(window, geometry)
+    def call_move_resize(window, requested)
+      geometry = requested.clone
+      left, right, top, bottom = window.frame_extents || [0, 0, 0, 0]
+      geometry[2] -= left + right
+      geometry[3] -= top + bottom
+
       @display.move_resize(window, geometry)
 
-      check_expected_geometry window, geometry
+      check_expected_geometry window, requested
     end
 
     def execute_and_detach(cmd)
@@ -88,7 +95,8 @@ module Sapristi
     LABELS = %w[x y width heigth].freeze
 
     def check_expected_geometry(window, expected)
-      actual = @display.windows(id: window.id).first.geometry
+      actual_window = @display.windows(id: window.id).first
+      actual = actual_window.exterior_frame || actual_window.geometry
 
       unless actual.eql? expected
         ::Sapristi.logger.warn "Geometry mismatch #{WindowManager.text_diff(actual, expected)}, requested=#{expected}"

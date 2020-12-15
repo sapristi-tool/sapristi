@@ -43,7 +43,7 @@ module Sapristi
 
     def serialize(definition)
       valid_headers.map do |field|
-        definition.raw_key?(field) ? definition.raw(field) : definition[field]
+        definition.raw_definition[field]
       end
     end
 

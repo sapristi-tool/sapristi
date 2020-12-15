@@ -28,7 +28,6 @@ module Sapristi
 
       def extract_monitor_info(line)
         monitor_info = MonitorManager.parse_line line
-
         Monitor.new monitor_info.merge work_area(monitor_info)
       end
 
