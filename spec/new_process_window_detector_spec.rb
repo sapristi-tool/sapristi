@@ -13,7 +13,7 @@ module Sapristi
     end
 
     after(:each) do
-      @windows.each { |w| WindowManager.new.close w }
+      @windows.compact.each { |w| WindowManager.new.close w }
       @waiters.each do |waiter|
         Process.kill(9, waiter.pid) if waiter.alive?
         sleep 0.25
@@ -31,13 +31,17 @@ module Sapristi
       end
 
       it 'detects window for new process' do
-        actual_window = subject.detect_window_for_process waiter, timeout
+        actual_window = subject.detect_window_for_process 'sol', timeout
+        @windows.push actual_window
+
         expect(actual_window).not_to be_nil
       end
 
       it 'window has the same pid as initial process' do
-        actual_window = subject.detect_window_for_process waiter, timeout
-        expect(actual_window.pid).to eq(waiter.pid)
+        actual_window = subject.detect_window_for_process 'sol', timeout
+        @windows.push actual_window
+
+        expect(subject.send(:cmd_for_pid, actual_window.pid)).to eq('sol')
       end
     end
 
@@ -50,16 +54,15 @@ module Sapristi
       end
 
       it 'detects two windows with same parent process' do
-        waiter1 = new_window
-        first_window = subject.detect_window_for_process waiter1, timeout
-        expect(first_window).not_to be_nil
+        first_window = subject.detect_window_for_process 'gedit --new-window', timeout
         @windows.push first_window
 
-        subject2 = NewProcessWindowDetector.new
-        waiter2 = new_window
-        second_window = subject2.detect_window_for_process waiter2, timeout
-        expect(second_window).not_to be_nil
+        expect(first_window).not_to be_nil
+
+        second_window = subject.detect_window_for_process 'gedit --new-window', timeout
         @windows.push second_window
+
+        expect(second_window).not_to be_nil
 
         expect(first_window.id).not_to eq(second_window.id)
       end

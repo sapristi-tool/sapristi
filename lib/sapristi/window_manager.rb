@@ -19,15 +19,7 @@ module Sapristi
     end
 
     def launch(cmd, timeout_in_seconds = 30)
-      window_detector = NewProcessWindowDetector.new
-
-      waiter = execute_and_detach cmd
-
-      process_window = window_detector.detect_window_for_process(waiter, timeout_in_seconds)
-
-      kill waiter unless process_window
-
-      process_window
+      NewProcessWindowDetector.new.detect_window_for_process(cmd, timeout_in_seconds)
     end
 
     def move_resize(window, x_position, y_position, width, height)
@@ -65,12 +57,6 @@ module Sapristi
       workspaces.find { |workspace| workspace.id.eql? id }
     end
 
-    def kill(waiter)
-      Process.kill 'KILL', waiter.pid
-      # sleep 1 # XLIB error for op code
-      raise Error, 'Error executing process, it didn\'t open a window'
-    end
-
     def call_move_resize(window, requested)
       geometry = requested.clone
       left, right, top, bottom = window.frame_extents || [0, 0, 0, 0]
@@ -80,16 +66,6 @@ module Sapristi
       @display.move_resize(window, geometry)
 
       check_expected_geometry window, requested
-    end
-
-    def execute_and_detach(cmd)
-      process_pid = begin
-        Process.spawn(cmd)
-      rescue StandardError
-        raise Error, "Error executing process: #{$ERROR_INFO}"
-      end
-      ::Sapristi.logger.info "Launch #{cmd.split[0]}, process=#{process_pid}"
-      Process.detach process_pid
     end
 
     LABELS = %w[x y width heigth].freeze
