@@ -4,54 +4,53 @@ module Sapristi
   class NewProcessWindowDetector
     def initialize
       @display = WMCtrl.display
+      @process_manager = Linux::ProcessManager.new
     end
 
-    attr_reader :previous_windows_ids, :previous_pids
+    attr_reader :previous_windows_ids, :previous_pids, :process_manager
 
     def detect_window_for_process(command, timeout_in_seconds)
-      @previous_windows_ids = @display.windows.map { |window| window[:id] }
-      @previous_pids = NewProcessWindowDetector.user_pids
+      save_pids_and_windows
 
-      program = command.split[0]
-      waiter = execute_and_detach command
-      process_window = wait_for_window(program, waiter, timeout_in_seconds)
+      process_window = wait_for_window(command, timeout_in_seconds)
 
-      ::Sapristi.logger.info "  Found window title=#{process_window.title} for process=#{waiter.pid}!" if process_window
+      if process_window
+        ::Sapristi.logger.info "  Found window title=#{process_window.title} for process=#{process_window.pid}!"
+      end
 
       process_window
     end
 
     private
 
-    def execute_and_detach(cmd)
-      process_pid = begin
-        Process.spawn(cmd)
-      rescue StandardError
-        raise Error, "Error executing process: #{$ERROR_INFO}"
-      end
-      ::Sapristi.logger.info "Launch #{cmd.split[0]}, process=#{process_pid}"
-      Process.detach process_pid
+    def save_pids_and_windows
+      @previous_windows_ids = @display.windows.map { |window| window[:id] }
+      @previous_pids = process_manager.user_pids
     end
 
-    def wait_for_window(program, waiter, timeout_in_seconds)
+    def wait_for_window(command, timeout_in_seconds)
+      program = command.split[0]
+      waiter = process_manager.execute_and_detach command
+
+      window = discover_window(waiter, program, timeout_in_seconds)
+      return window if window
+
+      raise Error, 'Error executing process, is dead' unless waiter.alive?
+
+      process_manager.kill waiter
+    end
+
+    def discover_window(waiter, program, timeout_in_seconds)
       start_time = Time.now
       while Time.now - start_time < timeout_in_seconds # && waiter.alive?
-        process_window = detect_new_windows.find { |window| window_for_waiter?(waiter, window) || window_for_command?(waiter, window, program) }
+        process_window = detect_new_windows.find do |window|
+          window_for_waiter?(waiter, window) || window_for_command?(waiter, window, program)
+        end
 
         return process_window if process_window
 
         sleep 0.5
       end
-
-      raise Error, 'Error executing process, is dead' unless waiter.alive?
-
-      kill waiter
-    end
-
-    def kill(waiter)
-      Process.kill 'KILL', waiter.pid
-      # sleep 1 # XLIB error for op code
-      raise Error, 'Error executing process, it didn\'t open a window'
     end
 
     def window_for_waiter?(waiter, window)
@@ -59,12 +58,7 @@ module Sapristi
     end
 
     def window_for_command?(waiter, window, program)
-      !waiter.alive? && cmd_for_pid(window.pid).start_with?(program)
-    end
-
-    def self.user_pids
-      user_id = `id -u`.strip
-      `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i)
+      !waiter.alive? && process_manager.cmd_for_pid(window.pid).start_with?(program)
     end
 
     def detect_new_windows
@@ -75,14 +69,6 @@ module Sapristi
 
     def new_window?(window)
       !previous_windows_ids.include?(window.id)
-    end
-
-    def cmd_for_pid(pid)
-      cmd = "ps -o cmd -p #{pid}"
-      line = `#{cmd}`.split("\n")[1]
-      raise Error, "No process found pid=#{pid}" unless line
-
-      line
     end
   end
 end
