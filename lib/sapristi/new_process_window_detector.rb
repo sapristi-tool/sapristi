@@ -21,15 +21,24 @@ module Sapristi
     private
 
     def wait_for_window(waiter, timeout_in_seconds)
+      command = 'gedit'
       start_time = Time.now
-      while Time.now - start_time < timeout_in_seconds && waiter.alive?
-        process_window = detect_new_windows.find { |window| window.pid.eql? waiter.pid }
+      while Time.now - start_time < timeout_in_seconds # && waiter.alive?
+        process_window = detect_new_windows.find { |window| window_for_waiter?(waiter, window) || window_for_command(waiter, window, command) }
 
         return process_window if process_window
 
         sleep 0.5
       end
       raise Error, 'Error executing process, is dead' unless waiter.alive?
+    end
+
+    def window_for_waiter?(waiter, window)
+      waiter.alive? && window.pid.eql?(waiter.pid)
+    end
+
+    def window_for_command(waiter, window, command)
+      !waiter.alive? && cmd_for_pid(window.pid).start_with?(command)
     end
 
     def self.user_pids
@@ -44,7 +53,15 @@ module Sapristi
     end
 
     def new_window?(window)
-      !previous_pids.include?(window.pid) && !previous_windows_ids.include?(window.id)
+      !previous_windows_ids.include?(window.id)
+    end
+
+    def cmd_for_pid(pid)
+      cmd = "ps -o cmd -p #{pid}"
+      line = `#{cmd}`.split("\n")[1]
+      raise Error, "No process found pid=#{pid}" unless line
+
+      line
     end
   end
 end
