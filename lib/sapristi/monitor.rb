@@ -10,7 +10,9 @@ module Sapristi
       instance_variable_get "@#{key}"
     end
 
-    attr_reader :id, :main, :name, :x, :y, :offset_x, :offset_y, :work_area, :work_area_width, :work_area_height
+    ATTRIBUTES = %i[id main name x y offset_x offset_y work_area work_area_width work_area_height].freeze
+
+    attr_reader(*ATTRIBUTES)
 
     def hash
       state.hash
@@ -25,7 +27,7 @@ module Sapristi
     protected
 
     def state
-      [@id, @main, @name, @x, @y, @offset_x, @offset_y, @work_area, @work_area_width, @work_area_height]
+      ATTRIBUTES.map { |attribute| send attribute }
     end
   end
 end
