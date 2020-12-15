@@ -10,14 +10,35 @@ module Sapristi
 
     def initialize(definition_hash)
       validate_raw definition_hash
-      @raw_definition = definition_hash.clone
+      @raw_definition = definition_hash.to_h.clone
 
       @monitor = MonitorManager.new.get_monitor_or_main definition_hash['Monitor']
       @workspace = WindowManager.new.find_workspace_or_current definition_hash['Workspace']&.to_i
       normalize_variables
     end
 
+    def to_s
+      %w[Command Title Monitor Workspace X-position Y-position V-size H-size]
+        .map { |key| "#{key}: #{raw_definition[key]}" }.join(', ')
+    end
+
     attr_reader :raw_definition, :monitor, :x_position, :y_position, :v_size, :h_size, :workspace, :command, :title
+
+    def hash
+      state.hash
+    end
+
+    def ==(other)
+      other.class == self.class && state == other.state
+    end
+
+    alias eql? ==
+
+    protected
+
+    def state
+      raw_definition
+    end
 
     private
 
