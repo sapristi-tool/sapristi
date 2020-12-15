@@ -11,7 +11,7 @@ module Sapristi
 
     def launch_n_windows(number_of_windows, command = 'sol')
       number_of_windows.times { |_i| @windows.push subject.launch(command) }
-      sleep 0.5
+      sleep 0.25
       @windows
     end
 
@@ -93,12 +93,12 @@ module Sapristi
         end
 
         it('when command ends') do
-          expect { subject.launch('/bin/ls > /dev/null') }
+          expect { subject.launch('/bin/ls > /dev/null', 1) }
             .to raise_error(Error, /Error executing process, is dead/)
         end
 
         it('when command does not create a window') do
-          non_dying_command = 'bash -c "read"'
+          non_dying_command = 'sleep 5'
           expect { subject.launch(non_dying_command, 1) }
             .to raise_error(Error, /Error executing process, it didn't open a window/)
         end

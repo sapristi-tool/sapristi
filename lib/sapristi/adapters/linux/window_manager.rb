@@ -22,7 +22,7 @@ module Sapristi
         #   Resource id in failed request:  0x2200008
         #   Serial number of failed request:  1095
         #   Current serial number in output stream:  1095
-        sleep 1
+        sleep 0.25
       end
 
       def windows(args = {})
@@ -34,7 +34,7 @@ module Sapristi
       end
 
       GRAVITY = 0
-      TIME_TO_APPLY_DIMENSIONS = 0.5
+      TIME_TO_APPLY_DIMENSIONS = 0.25
 
       def move_resize(window, geometry)
         @display.action_window(window.id, :move_resize, GRAVITY, *geometry)
