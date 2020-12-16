@@ -18,10 +18,6 @@ module Sapristi
       @display.windows title: title_regex
     end
 
-    def launch(cmd, timeout_in_seconds = 30)
-      NewProcessWindowDetector.new.detect_window_for_process(cmd, timeout_in_seconds)
-    end
-
     def move_resize(window, x_position, y_position, width, height)
       call_move_resize(window, [x_position, y_position, width, height])
     end

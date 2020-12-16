@@ -9,12 +9,12 @@ module Sapristi
 
     context('fetch window') do
       it('launches command when window title not specified') do
-        window_manager = spy('window_manager')
+        window_detector = spy('window_detector')
 
         definition = build(:a_valid_definition, attrs: { 'Command' => command, 'Title' => nil })
-        DefinitionProcessor.new(window_manager).process_definition(definition)
+        DefinitionProcessor.new(spy('window_manager'), window_detector).process_definition(definition)
 
-        expect(window_manager).to have_received(:launch).with(command)
+        expect(window_detector).to have_received(:detect_window_for_process).with(command)
       end
 
       it('uses window when found by title') do
@@ -38,8 +38,9 @@ module Sapristi
 
         it('when more than one window have the same title') do
           window_manager = WindowManager.new
-          a_window = window_manager.launch command
-          another_window = window_manager.launch command
+          launcher = NewProcessWindowDetector.new
+          a_window = launcher.detect_window_for_process command
+          another_window = launcher.detect_window_for_process command
 
           duplicated_title = /Klondike/
           expect do

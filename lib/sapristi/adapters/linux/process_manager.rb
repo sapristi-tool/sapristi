@@ -19,7 +19,7 @@ module Sapristi
         raise Error, 'Error executing process, it didn\'t open a window'
       end
 
-      def user_pids
+      def self.user_pids
         user_id = `id -u`.strip
         `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i)
       end

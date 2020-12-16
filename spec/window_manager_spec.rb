@@ -10,7 +10,7 @@ module Sapristi
     after(:each) { @windows.each { |window| subject.close(window) } }
 
     def launch_n_windows(number_of_windows, command = 'sol')
-      number_of_windows.times { |_i| @windows.push subject.launch(command) }
+      number_of_windows.times { |_i| @windows.push NewProcessWindowDetector.new.detect_window_for_process(command) }
       sleep 0.25
       @windows
     end
@@ -83,37 +83,6 @@ module Sapristi
         actual_windows = subject.find_window(/no window title/).map(&:to_h)
         expect(actual_windows.to_a).to have(0).items
       end
-    end
-
-    context('#launch') do
-      context('raises an error') do
-        it('when command is invalid') do
-          expect { subject.launch('invalid_command') }
-            .to raise_error(Error, /Error executing process: No such file or directory/)
-        end
-
-        it('when command ends') do
-          expect { subject.launch('/bin/ls > /dev/null', 1) }
-            .to raise_error(Error, /Error executing process, is dead/)
-        end
-
-        it('when command does not create a window') do
-          non_dying_command = 'sleep 5'
-          expect { subject.launch(non_dying_command, 1) }
-            .to raise_error(Error, /Error executing process, it didn't open a window/)
-        end
-      end
-
-      it('launches a new gedit window and process') do
-        previous_pids = current_user_pids
-        window = subject.launch('gedit --new-window /tmp/some_file.txt -s')
-        expect(previous_pids).not_to include(window.pid)
-      ensure
-        subject.close(window) if window
-      end
-
-      let(:user_id) { `id -u`.strip }
-      let(:current_user_pids) { `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i) }
     end
   end
 end

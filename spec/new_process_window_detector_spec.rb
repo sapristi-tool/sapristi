@@ -67,5 +67,36 @@ module Sapristi
         expect(first_window.id).not_to eq(second_window.id)
       end
     end
+
+    context('#detect_window_for_process') do
+      context('raises an error') do
+        it('when command is invalid') do
+          expect { subject.detect_window_for_process('invalid_command') }
+            .to raise_error(Error, /Error executing process: No such file or directory/)
+        end
+
+        it('when command ends') do
+          expect { subject.detect_window_for_process('/bin/ls > /dev/null', 1) }
+            .to raise_error(Error, /Error executing process, is dead/)
+        end
+
+        it('when command does not create a window') do
+          non_dying_command = 'sleep 5'
+          expect { subject.detect_window_for_process(non_dying_command, 1) }
+            .to raise_error(Error, /Error executing process, it didn't open a window/)
+        end
+      end
+
+      it('launches a new gedit window and process') do
+        previous_pids = current_user_pids
+        window = subject.detect_window_for_process('gedit --new-window /tmp/some_file.txt -s')
+        expect(previous_pids).not_to include(window.pid)
+      ensure
+        WindowManager.new.close(window) if window
+      end
+
+      let(:user_id) { `id -u`.strip }
+      let(:current_user_pids) { `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i) }
+    end
   end
 end

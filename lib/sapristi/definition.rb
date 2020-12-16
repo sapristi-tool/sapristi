@@ -51,12 +51,16 @@ module Sapristi
     end
 
     def validate_raw(definition)
-      raise Error, 'No command or window title specified' if definition['Command'].nil? && definition['Title'].nil?
+      raise Error, 'No command or window title specified' unless definition['Command'] || definition['Title']
 
+      validate_geometry(definition)
+
+      raise Error, "Invalid monitor=#{definition['Monitor']}" if definition['Monitor']&.to_i&.negative?
+    end
+
+    def validate_geometry(definition)
       geometry_field_nil = %w[H-size V-size X-position Y-position].find { |key| definition[key].nil? }
       raise Error, "No #{geometry_field_nil} specified" if geometry_field_nil
-
-      raise Error, 'Invalid monitor=-1' if definition['Monitor']&.to_i&.negative?
     end
   end
 end

@@ -2,28 +2,24 @@
 
 module Sapristi
   class DefinitionProcessor
-    def initialize(window_manager = WindowManager.new)
+    def initialize(window_manager = WindowManager.new, process_manager = NewProcessWindowDetector.new)
       @window_manager = window_manager
+      @process_manager = process_manager
     end
 
     def process_definition(definition)
-      title = definition.title
-      command = definition.command
-      x_position = definition.x_position
-      y_position = definition.y_position
-      width = definition.h_size
-      height = definition.v_size
+      window = get_window definition.title, definition.command
 
-      window = get_window title, command
-
-      @window_manager.move_resize(window, x_position, y_position, width, height)
+      @window_manager.move_resize(window,
+                                  definition.x_position, definition.y_position,
+                                  definition.h_size, definition.v_size)
     end
 
     private
 
     def get_window(title, command)
       (title && find_one_by_title(title)) ||
-        (command && @window_manager.launch(command)) ||
+        (command && @process_manager.detect_window_for_process(command)) ||
         raise(Error, "Couldn't produce a window for this definition")
     end
 

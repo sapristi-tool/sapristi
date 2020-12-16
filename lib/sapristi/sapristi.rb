@@ -18,7 +18,9 @@ module Sapristi
       process definitions
     end
 
-    attr_reader :verbose, :dry
+    def verbose?
+      @verbose
+    end
 
     def verbose!
       @verbose = true
@@ -29,6 +31,10 @@ module Sapristi
       @dry = true
       logger = ::Sapristi.logger
       logger.level = :info if logger.level > Logger::INFO
+    end
+
+    def dry?
+      @dry
     end
 
     private

@@ -7,9 +7,7 @@ module Sapristi
       @process_manager = Linux::ProcessManager.new
     end
 
-    attr_reader :previous_windows_ids, :previous_pids, :process_manager
-
-    def detect_window_for_process(command, timeout_in_seconds)
+    def detect_window_for_process(command, timeout_in_seconds = 30)
       save_pids_and_windows
 
       process_window = wait_for_window(command, timeout_in_seconds)
@@ -23,9 +21,11 @@ module Sapristi
 
     private
 
+    attr_reader :previous_windows_ids, :previous_pids, :process_manager
+
     def save_pids_and_windows
       @previous_windows_ids = @display.windows.map { |window| window[:id] }
-      @previous_pids = process_manager.user_pids
+      @previous_pids = process_manager.class.user_pids
     end
 
     def wait_for_window(command, timeout_in_seconds)
