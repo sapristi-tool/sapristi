@@ -7,13 +7,13 @@ require 'sapristi/version'
 Gem::Specification.new do |spec|
   spec.name          = 'sapristi'
   spec.version       = Sapristi::VERSION
-  spec.authors       = ['']
-  # spec.email         = ["TODO: Write your email address"]
+  spec.authors       = ['Sapristi dev']
+  spec.email         = ['sapristi.tool [at] protonmail.com']
 
   spec.summary       = 'A gem to rule your apps in GNOME workspaces.'
   # spec.description   = %q{TODO: Write a longer description or delete this line.}
   # spec.homepage      = "TODO: Put your gem's website or public repo URL here."
-  spec.license       = 'MIT'
+  spec.licenses      = ['AGPL-3.0-or-later', 'Nonstandard']
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
