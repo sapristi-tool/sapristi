@@ -32,8 +32,8 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/sapristi.
+Bug reports and pull requests are welcome on GitHub at https://github.com/sapristi-tool/sapristi.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+Please see [LICENSE](https://github.com/sapristi-tool/sapristi/blob/master/LICENSE.txt) for personal usage and [COMM-LICENSE](https://github.com/sapristi-tool/sapristi/blob/master/COMM-LICENSE.txt) for commercial usage.

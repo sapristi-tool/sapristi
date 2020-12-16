@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'A gem to rule your apps in GNOME workspaces.'
   # spec.description   = %q{TODO: Write a longer description or delete this line.}
-  # spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = 'https://github.com/sapristi-tool/sapristi'
   spec.licenses      = ['AGPL-3.0-or-later', 'Nonstandard']
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
