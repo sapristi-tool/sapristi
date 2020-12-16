@@ -47,7 +47,7 @@ module Sapristi
       csv_rows.each_with_index.map do |definition, line|
         @definition_parser.parse(definition)
       rescue Error => e
-        raise Error, "Invalid configuration file: #{e.message}, line=#{line}"
+        raise Error, "Invalid configuration file: #{e.message}, line=#{line}, file=#{file}"
       rescue StandardError => e
         raise Error, "Unable to process configuration file: #{file}, line=#{line}, error=#{e.message}"
       end

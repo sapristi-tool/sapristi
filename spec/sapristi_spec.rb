@@ -32,31 +32,22 @@ module Sapristi
       expect(File.exist?(mock_conf_file)).to be_truthy
     end
 
-    xit 'process lines in configuration file' do
+    it 'process lines in configuration file' do
       definition = build(:a_valid_definition)
-      file = Tempfile.create 'foo'
-      file_path = file.path
-      file.close
-      File.delete file_path
-      ConfigurationLoader.new.save(file_path, [definition])
+      file_path = build(:valid_csv_file_path, rows: [definition.raw_definition])
 
       definition_processor = spy(DefinitionProcessor.new)
 
       Sapristi.new(definition_processor: definition_processor).run file_path
 
-      expect(definition_processor).to have_received(:process_definition).with(definition.transform_keys(&:to_s))
+      expect(definition_processor).to have_received(:process_definition).with(definition)
     end
 
-    xit 'appends line number to error when processing file' do
-      definition = build(:valid_hash, attrs: { 'Command' => nil, 'Title' => nil })
+    it 'appends line number to error when processing file' do
+      invalid_rows = [build(:valid_hash, attrs: { 'Command' => nil, 'Title' => nil })]
+      file_path = build(:valid_csv_file_path, rows: invalid_rows)
 
-      file = Tempfile.create 'foo'
-      file_path = file.path
-      file.close
-      File.delete file_path
-      ConfigurationLoader.new.save(file_path, [definition])
-
-      expect { Sapristi.new.run file_path }.to raise_error Error
+      expect { Sapristi.new.run file_path }.to raise_error Error, /line=0/
     end
   end
 end
