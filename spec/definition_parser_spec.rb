@@ -57,14 +57,14 @@ RSpec.describe DefinitionParser do
       allow_any_instance_of(WindowManager).to receive(:workspaces).and_return(workspaces)
     end
 
+    let(:invalid_headers) { build(:valid_hash, attrs: { invalid_header: nil }) }
     it 'when headers' do
-      definition_attrs = build(:valid_hash, attrs: { invalid_header: nil })
-      expect { subject.parse definition_attrs }.to raise_error(Error, /Invalid configuration file: invalid headers/)
+      expect { subject.parse invalid_headers }.to raise_error(Error, /Invalid configuration file: invalid headers/)
     end
 
+    let(:invalid_definition) { build(:valid_hash, attrs: { 'Command' => nil, 'Title' => nil }) }
     it 'when no window and no command specified' do
-      definition_attrs = build(:valid_hash, attrs: { 'Command' => nil, 'Title' => nil })
-      expect { subject.parse definition_attrs }.to raise_error(Error, /No command or window title specified/)
+      expect { subject.parse invalid_definition }.to raise_error(Error, /No command or window title specified/)
     end
 
     it 'when any of the geometry values is not defined' do
@@ -74,20 +74,18 @@ RSpec.describe DefinitionParser do
       end
     end
 
+    let(:definition_with_x_after_monitor_width) { build(:valid_hash, attrs: { 'X-position' => monitor_width }) }
     it 'when fixed x > monitor width' do
-      definition_attrs = build(:valid_hash, attrs: { 'X-position' => monitor_width })
-
-      valid = "0..#{monitor_width - 1}"
-      expect { subject.parse definition_attrs }
-        .to raise_error(Error, /x=#{monitor_width} is outside of monitor width dimension=#{valid}/)
+      x_range = "0..#{monitor_width - 1}"
+      expect { subject.parse definition_with_x_after_monitor_width }
+        .to raise_error(Error, /x=#{monitor_width} is outside of monitor width dimension=#{x_range}/)
     end
 
+    let(:definition_with_y_after_monitor_length) { build(:valid_hash, attrs: { 'Y-position' => monitor_height }) }
     it 'when fixed y > monitor length' do
-      definition_attrs = build(:valid_hash, attrs: { 'Y-position' => monitor_height })
-
-      valid = "0..#{monitor_height - 1}"
-      expect { subject.parse definition_attrs }
-        .to raise_error(Error, /y=#{monitor_height} is outside of monitor height dimension=#{valid}/)
+      y_range = "0..#{monitor_height - 1}"
+      expect { subject.parse definition_with_y_after_monitor_length }
+        .to raise_error(Error, /y=#{monitor_height} is outside of monitor height dimension=#{y_range}/)
     end
 
     it 'when fixed x < 0' do

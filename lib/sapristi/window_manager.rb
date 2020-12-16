@@ -71,7 +71,7 @@ module Sapristi
       actual = actual_window.exterior_frame || actual_window.geometry
 
       unless actual.eql? expected
-        ::Sapristi.logger.warn "Geometry mismatch #{WindowManager.text_diff(actual, expected)}, requested=#{expected}"
+        ::Sapristi.logger.warn "Geometry mismatch #{WindowManager.text_diff(actual, expected)}, requested=#{expected}, window=#{window.title}"
       end
     end
 

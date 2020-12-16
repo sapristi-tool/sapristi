@@ -17,12 +17,13 @@ module Sapristi
         expect(window_detector).to have_received(:detect_window_for_process).with(command)
       end
 
+      let(:window_manager) { spy('window_manager') }
+      let(:window) { double('window', pid: 1, title: 'title') }
+      let(:definition) { build(:a_valid_definition, attrs: { 'Command' => command, 'Title' => 'Klondike' }) }
+
       it('uses window when found by title') do
-        window_manager = spy('window_manager')
-        window = double('window', pid: 1, title: 'title')
         allow(window_manager).to receive(:find_window).with(/Klondike/).and_return([window])
 
-        definition = build(:a_valid_definition, attrs: { 'Command' => command, 'Title' => 'Klondike' })
         DefinitionProcessor.new(window_manager).process_definition(definition)
 
         expect(window_manager).to have_received(:move_resize).with(window, any_args)
@@ -36,20 +37,18 @@ module Sapristi
           end.to raise_error Error, "Couldn't produce a window for this definition"
         end
 
+        let(:launcher) { NewProcessWindowDetector.new }
+        let!(:a_window) { launcher.detect_window_for_process command }
+        let!(:another_window) { launcher.detect_window_for_process command }
         it('when more than one window have the same title') do
-          window_manager = WindowManager.new
-          launcher = NewProcessWindowDetector.new
-          a_window = launcher.detect_window_for_process command
-          another_window = launcher.detect_window_for_process command
-
           duplicated_title = /Klondike/
           expect do
             definition = build(:a_valid_definition, attrs: { 'Command' => nil, 'Title' => duplicated_title })
             subject.process_definition(definition)
           end.to raise_error Error, "2 windows have the same title: #{duplicated_title}"
-        ensure
-          window_manager.close(a_window) if a_window
-          window_manager.close(another_window) if another_window
+        end
+        after(:each) do
+          [a_window, another_window].each { |window| WindowManager.new.close(window) }
         end
       end
     end
