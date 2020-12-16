@@ -46,4 +46,6 @@ module Sapristi
   end
 end
 
-Sapristi::Runner.new.run(ARGV) if $PROGRAM_NAME == __FILE__
+cmd_invocation = $PROGRAM_NAME == __FILE__
+gem_bin_wrapper = File.basename($PROGRAM_NAME).eql?(File.basename(__FILE__))
+Sapristi::Runner.new.run(ARGV) if cmd_invocation || gem_bin_wrapper
