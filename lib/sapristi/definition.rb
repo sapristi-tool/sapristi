@@ -18,8 +18,7 @@ module Sapristi
     end
 
     def to_s
-      %w[Command Title Monitor Workspace X-position Y-position V-size H-size]
-        .map { |key| "#{key}: #{raw_definition[key]}" }.join(', ')
+      HEADERS.map { |key| "#{key}: #{raw_definition[key]}" }.join(', ')
     end
 
     attr_reader :raw_definition, :monitor, :x_position, :y_position, :v_size, :h_size, :workspace, :command, :title
@@ -51,6 +50,7 @@ module Sapristi
     end
 
     def validate_raw(definition)
+      validate_headers(definition)
       raise Error, 'No command or window title specified' unless definition['Command'] || definition['Title']
 
       validate_geometry(definition)
@@ -61,6 +61,17 @@ module Sapristi
     def validate_geometry(definition)
       geometry_field_nil = %w[H-size V-size X-position Y-position].find { |key| definition[key].nil? }
       raise Error, "No #{geometry_field_nil} specified" if geometry_field_nil
+    end
+
+    HEADERS = %w[Title Command Monitor Workspace X-position Y-position H-size V-size].freeze
+
+    def validate_headers(definition)
+      headers = definition.keys
+      return if Set.new(HEADERS).superset?(Set.new(headers))
+
+      actual_headers = headers.join(', ')
+      expected_headers = HEADERS.join(', ')
+      raise Error, "Invalid configuration file: invalid headers=#{actual_headers}, valid=#{expected_headers}"
     end
   end
 end

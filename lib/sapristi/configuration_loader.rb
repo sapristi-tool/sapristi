@@ -15,14 +15,10 @@ module Sapristi
       parse_rows(csv_rows, file_path)
     end
 
-    def valid_headers
-      %w[Title Command Monitor X-position Y-position H-size V-size Workspace]
-    end
-
     def create_empty_configuration(conf_file)
       raise Error, "Trying to write empty configuration on existing file #{conf_file}" if File.exist? conf_file
 
-      File.write(conf_file, valid_headers.join(SEPARATOR))
+      File.write(conf_file, Definition::HEADERS.join(SEPARATOR))
     end
 
     def save(conf_file, definitions)
@@ -36,13 +32,13 @@ module Sapristi
     private
 
     def write_to_csv(conf_file, serialized)
-      CSV.open(conf_file, 'wb', write_headers: true, headers: valid_headers, col_sep: SEPARATOR) do |csv|
+      CSV.open(conf_file, 'wb', write_headers: true, headers: Definition::HEADERS, col_sep: SEPARATOR) do |csv|
         serialized.each { |definition| csv << definition }
       end
     end
 
     def serialize(definition)
-      valid_headers.map do |field|
+      Definition::HEADERS.map do |field|
         definition.raw_definition[field]
       end
     end
@@ -62,19 +58,9 @@ module Sapristi
     rescue Errno::ENOENT
       raise Error, "Configuration file not found: #{csv_file}"
     else
-      raise Error, 'Invalid configuration file: Empty file' if table.eql? []
+      raise Error, "Invalid configuration file: Empty file #{csv_file}" if table.eql? []
 
-      validate_headers(table)
-      table
-    end
-
-    def validate_headers(table)
-      headers = table.headers
-      return if headers.eql? valid_headers
-
-      actual_headers = headers.join(', ')
-      expected_headers = valid_headers.join(', ')
-      raise Error, "Invalid configuration file: invalid headers=#{actual_headers}, valid=#{expected_headers}"
+      table.map(&:to_h)
     end
   end
 end

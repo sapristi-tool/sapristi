@@ -44,11 +44,6 @@ RSpec.describe ConfigurationLoader do
 
         expect { subject.load(empty_file) }.to raise_error(Error, /Invalid configuration file: Empty file/)
       end
-
-      it 'when csv format is invalid' do
-        invalid_csv = build(:invalid_csv_file_path)
-        expect { subject.load(invalid_csv) }.to raise_error(Error, /Invalid configuration file: invalid headers/)
-      end
     end
   end
 
@@ -86,7 +81,7 @@ RSpec.describe ConfigurationLoader do
 
     it 'writes empty configuration' do
       subject.create_empty_configuration non_existing_file
-      expect(File.read(non_existing_file)).to eql subject.valid_headers.join(ConfigurationLoader::SEPARATOR)
+      expect(File.read(non_existing_file)).to eql Definition::HEADERS.join(ConfigurationLoader::SEPARATOR)
     end
   end
 end

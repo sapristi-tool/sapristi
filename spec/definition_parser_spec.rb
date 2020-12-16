@@ -57,6 +57,11 @@ RSpec.describe DefinitionParser do
       allow_any_instance_of(WindowManager).to receive(:workspaces).and_return(workspaces)
     end
 
+    it 'when headers' do
+      definition_attrs = build(:valid_hash, attrs: { invalid_header: nil })
+      expect { subject.parse definition_attrs }.to raise_error(Error, /Invalid configuration file: invalid headers/)
+    end
+
     it 'when no window and no command specified' do
       definition_attrs = build(:valid_hash, attrs: { 'Command' => nil, 'Title' => nil })
       expect { subject.parse definition_attrs }.to raise_error(Error, /No command or window title specified/)
