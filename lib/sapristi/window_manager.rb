@@ -1,18 +1,16 @@
 # frozen_string_literal: true
 
+require 'forwardable'
+
 module Sapristi
   class WindowManager
+    extend Forwardable
+
     def initialize
       @display = Linux::WindowManager.new
     end
 
-    def windows
-      @display.windows
-    end
-
-    def close(window)
-      @display.close(window)
-    end
+    def_delegators :@display, :windows, :close, :workspaces
 
     def find_window(title_regex)
       @display.windows title: title_regex
@@ -32,10 +30,6 @@ module Sapristi
       actual_window = @display.windows(id: window.id).first
       width, height = (actual_window.exterior_frame || actual_window.geometry)[2..3]
       call_move_resize(window, [x_position, y_position, width, height])
-    end
-
-    def workspaces
-      @display.workspaces
     end
 
     def find_workspace_or_current(id)

@@ -15,54 +15,6 @@ module Sapristi
       @windows
     end
 
-    it('fetch open windows returns same result as command line wmctrl') do
-      expected = `wmctrl -l`.split("\n").map { |line| line.split[0].to_i(16) }
-      actual = subject.windows.map(&:id)
-
-      expect(actual).to contain_exactly(*expected)
-    end
-
-    # FIXME
-    context('window manipulation') do
-      let(:window) { launch_n_windows(1, 'gedit --new-window -s').first }
-      let(:expected_width) { window.geometry[2] - inc_x }
-      let(:expected_height) { window.geometry[3] - inc_y }
-      let(:window_geometry) { subject.windows.find { |actual_window| actual_window.id.eql? window.id }.geometry }
-
-      it('can resize windows') do
-        subject.resize(window, expected_width, expected_height)
-
-        expect(window_geometry[2..3]).to eq([expected_width, expected_height])
-      end
-
-      let(:inc_x) { 10 }
-      let(:inc_y) { 20 }
-      let(:x_pos) { window.geometry[0] + inc_x }
-      let(:y_pos) { window.geometry[1] + inc_y }
-
-      it('can move windows') do
-        subject.move(window, x_pos, y_pos)
-
-        expect(window_geometry[0..1]).to eq([x_pos, y_pos])
-      end
-
-      it('when moving reads size from the system not the window') do
-        subject.resize(window, expected_width, expected_height)
-
-        subject.move(window, x_pos, y_pos)
-
-        expect(window_geometry).to eq([x_pos, y_pos, expected_width, expected_height])
-      end
-
-      it('when resizing reads position from the system not the window') do
-        subject.move(window, x_pos, y_pos)
-
-        subject.resize(window, expected_width, expected_height)
-
-        expect(window_geometry).to eq([x_pos, y_pos, expected_width, expected_height])
-      end
-    end
-
     context('#find_window') do
       it 'one window by title' do
         expected = launch_n_windows(1, 'gedit --new-window deleteme_title.txt -s').map(&:id)
