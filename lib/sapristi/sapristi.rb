@@ -49,9 +49,9 @@ module Sapristi
     end
 
     def check_user_configuration(conf_file)
-      if conf_file.eql?(Sapristi.user_default_configuration_file) && !File.exist?(conf_file)
-        @configuration_loader.create_empty_configuration conf_file
-      end
+      return unless conf_file.eql?(Sapristi.user_default_configuration_file) && !File.exist?(conf_file)
+      
+      @configuration_loader.create_empty_configuration conf_file
     end
 
     def self.user_default_configuration_file

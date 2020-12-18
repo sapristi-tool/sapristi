@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module Sapristi
+  # rubocop:disable Metrics/BlockLength:
   FactoryBot.define do
+    # rubocop:enable Metrics/BlockLength:
     factory :valid_definition_hashes, class: Array do
       initialize_with do
         [

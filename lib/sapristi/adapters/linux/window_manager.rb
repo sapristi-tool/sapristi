@@ -79,14 +79,18 @@ module Sapristi
         actual_window = @display.windows(id: window.id).first
         actual = actual_window.exterior_frame || actual_window.geometry
 
-        unless actual.eql? expected
-          ::Sapristi.logger.warn "Geometry mismatch #{WindowManager.text_diff(actual, expected)}, requested=#{expected}, window=#{window.title}"
-        end
+        return if actual.eql? expected
+
+        # rubocop:disable Layout/LineLength
+        ::Sapristi.logger.warn "Geometry mismatch #{WindowManager.text_diff(actual, expected)}, requested=#{expected}, window=#{window.title}"
+        # rubocop:enable Layout/LineLength
       end
 
       def self.text_diff(actual, expected)
         diffs = 4.times.filter { |index| !expected[index].eql? actual[index] }
-        diffs.map { |diff_index| "#{LABELS[diff_index]}: expected=#{expected[diff_index]}, actual=#{actual[diff_index]}" }.join(', ')
+        diffs.map do |diff_index|
+          "#{LABELS[diff_index]}: expected=#{expected[diff_index]}, actual=#{actual[diff_index]}"
+        end.join(', ')
       end
     end
 

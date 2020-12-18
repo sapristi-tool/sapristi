@@ -3,7 +3,9 @@
 require 'ostruct'
 
 module Sapristi
+  # rubocop:disable Metrics/BlockLength:
   FactoryBot.define do
+    # rubocop:enable Metrics/BlockLength:
     factory :monitor, class: Hash do
       data do
         { id: 0, name: 'some', main: '*', x: 3840, y: 2160, offset_x: 0, offset_y: 0,
@@ -55,7 +57,11 @@ module Sapristi
     factory :xrandr_example, class: String do
       initialize_with do
         monitors = build(:monitors)
-        lines = monitors.each_with_index.map { |monitor, index| "#{index}: +#{monitor['main'] ? '*' : ''}#{monitor['name']} #{monitor['x']}/123x#{monitor['y']}/456+#{monitor['offset_x']}+#{monitor['offset_y']}+0 #{monitor['name']}" }
+        lines = monitors.each_with_index.map do |monitor, index|
+          main = monitor['main'] ? '*' : ''
+          resolution = "#{monitor['x']}/123x#{monitor['y']}/456+#{monitor['offset_x']}+#{monitor['offset_y']}+0"
+          "#{index}: +#{main}#{monitor['name']} #{resolution} #{monitor['name']}"
+        end
 
         (["Monitors: #{monitors.size}"] + lines).join("\n")
       end

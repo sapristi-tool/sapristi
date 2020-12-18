@@ -11,8 +11,8 @@ module Sapristi
       window = get_window definition.title, definition.command
 
       @window_manager.move_resize(window,
-                                  definition.x_position, definition.y_position,
-                                  definition.h_size, definition.v_size)
+                                  [definition.x_position, definition.y_position,
+                                   definition.h_size, definition.v_size])
     end
 
     private
