@@ -18,5 +18,9 @@ module Sapristi
     it 'gets window manager for linux' do
       expect(subject.window_manager).to be_instance_of(Linux::WindowManager)
     end
+
+    it 'gets process manager for linux' do
+      expect(subject.process_manager).to eq(Linux::ProcessManager)
+    end
   end
 end

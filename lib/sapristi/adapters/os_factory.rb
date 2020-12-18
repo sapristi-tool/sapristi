@@ -18,6 +18,10 @@ module Sapristi
       factory_module.const_get('WindowManager').new
     end
 
+    def process_manager
+      factory_module.const_get('ProcessManager')
+    end
+
     def linux?
       @os.linux?
     end

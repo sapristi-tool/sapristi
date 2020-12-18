@@ -4,7 +4,7 @@ module Sapristi
   class NewProcessWindowDetector
     def initialize
       @display = WMCtrl.display
-      @process_manager = Linux::ProcessManager
+      @process_manager = OSFactory.new.process_manager
     end
 
     def detect_window_for_process(command, timeout_in_seconds = 30)
