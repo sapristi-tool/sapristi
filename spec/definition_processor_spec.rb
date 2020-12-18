@@ -75,7 +75,7 @@ module Sapristi
       it 'move and resize window' do
         subject.process_definition(definition)
 
-        expect(window_manager).to have_received(:move_resize).with(window, x_position, y_position, size_x, size_y)
+        expect(window_manager).to have_received(:move_resize).with(window, [x_position, y_position, size_x, size_y])
       end
     end
   end
