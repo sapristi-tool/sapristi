@@ -62,7 +62,18 @@ module Sapristi
 
       def complete_geometry(window_id, requested)
         window = @display.windows(id: window_id).first
-        geometry = (window.exterior_frame || window.geometry)
+        Geometry.new(window).merge(requested)
+      end
+    end
+
+    class Geometry
+      def initialize(window)
+        @geometry = window.exterior_frame || window.geometry
+      end
+
+      attr_reader :geometry
+
+      def merge(requested)
         [requested.fetch(:x_position, geometry[0]),
          requested.fetch(:y_position, geometry[1]),
          requested.fetch(:width, geometry[2]),
