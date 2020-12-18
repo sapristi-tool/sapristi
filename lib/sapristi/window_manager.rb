@@ -7,7 +7,7 @@ module Sapristi
     extend Forwardable
 
     def initialize
-      @display = Linux::WindowManager.new
+      @display = OSFactory.new.window_manager
     end
 
     def_delegators :@display, :windows, :close, :workspaces, :move_resize, :resize, :move

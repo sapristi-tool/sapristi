@@ -15,6 +15,7 @@ require 'sapristi/adapters/linux/window_manager'
 require 'sapristi/adapters/linux/process_manager'
 require 'sapristi/new_process_window_detector'
 require 'sapristi/monitor'
+require 'sapristi/adapters/os_factory'
 require 'logger'
 
 module Sapristi
