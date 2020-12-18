@@ -41,7 +41,7 @@ module Sapristi
         actual_window = subject.detect_window_for_process 'sol', timeout
         @windows.push actual_window
 
-        expect(Linux::ProcessManager.new.cmd_for_pid(actual_window.pid)).to eq('sol')
+        expect(Linux::ProcessManager.cmd_for_pid(actual_window.pid)).to eq('sol')
       end
     end
 

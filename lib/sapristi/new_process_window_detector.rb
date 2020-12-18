@@ -4,7 +4,7 @@ module Sapristi
   class NewProcessWindowDetector
     def initialize
       @display = WMCtrl.display
-      @process_manager = Linux::ProcessManager.new
+      @process_manager = Linux::ProcessManager
     end
 
     def detect_window_for_process(command, timeout_in_seconds = 30)
@@ -25,7 +25,7 @@ module Sapristi
 
     def save_pids_and_windows
       @previous_windows_ids = @display.windows.map { |window| window[:id] }
-      @previous_pids = process_manager.class.user_pids
+      @previous_pids = process_manager.user_pids
     end
 
     def wait_for_window(command, timeout_in_seconds)

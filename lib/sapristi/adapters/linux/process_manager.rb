@@ -3,7 +3,7 @@
 module Sapristi
   module Linux
     class ProcessManager
-      def execute_and_detach(cmd)
+      def self.execute_and_detach(cmd)
         process_pid = begin
           Process.spawn(cmd)
         rescue StandardError
@@ -13,7 +13,7 @@ module Sapristi
         Process.detach process_pid
       end
 
-      def kill(waiter)
+      def self.kill(waiter)
         Process.kill 'KILL', waiter.pid
         # sleep 1 # XLIB error for op code
         raise Error, 'Error executing process, it didn\'t open a window'
@@ -24,7 +24,7 @@ module Sapristi
         `ps -u #{user_id}`.split("\n")[1..nil].map(&:to_i)
       end
 
-      def cmd_for_pid(pid)
+      def self.cmd_for_pid(pid)
         cmd = "ps -o cmd -p #{pid}"
         line = `#{cmd}`.split("\n")[1]
         raise Error, "No process found pid=#{pid}" unless line
