@@ -5,35 +5,6 @@ require 'spec_helper'
 module Sapristi
   module Linux
     RSpec.describe WindowManager do
-      context 'deal with extended window manager hints' do
-        let(:display) { double('display') }
-        subject { WindowManager.new(display) }
-
-        let(:window_with_maximized_hortz) do
-          instance_double('window', id: 1, maximized_horizontally?: true, maximized_vertically?: false)
-        end
-
-        let(:window_with_maximized_vert) do
-          instance_double('window', id: 1, maximized_horizontally?: false, maximized_vertically?: true)
-        end
-
-        let(:geometry) { [100, 100, 100, 100] }
-
-        before(:each) { allow(display).to receive(:action_window) }
-
-        it 'removes wm extended window manager_hints when max_horz' do
-          expect(subject).to receive(:remove_extended_hints).with(window_with_maximized_hortz)
-
-          subject.move_resize window_with_maximized_hortz, geometry
-        end
-
-        it 'removes wm extended window manager_hints when max_vert' do
-          expect(subject).to receive(:remove_extended_hints).with(window_with_maximized_vert)
-
-          subject.move_resize window_with_maximized_vert, geometry
-        end
-      end
-
       it('fetch open windows returns same result as command line wmctrl') do
         expected = `wmctrl -l`.split("\n").map { |line| line.split[0].to_i(16) }
         actual = subject.windows.map(&:id)
@@ -63,6 +34,28 @@ module Sapristi
         let(:inc_y) { 20 }
         let(:x_pos) { window.geometry[0] + inc_x }
         let(:y_pos) { window.geometry[1] + inc_y }
+        let(:a_geometry) { [200, 200, 600, 600] }
+
+        it 'removes wm extended window manager_hints when max_horz' do
+          subject.display.action_window(window.id, :change_state, 'add', 'maximized_horz')
+          sleep 0.25
+          window_with_maximized_horz = subject.windows(id: window.id).first
+          expect(window_with_maximized_horz.maximized_horizontally?).to be_truthy
+
+          subject.move_resize window_with_maximized_horz, a_geometry
+          expect(subject.windows(id: window.id).first.maximized_horizontally?).to be_falsey
+        end
+
+        it 'removes wm extended window manager_hints when max_vert' do
+          subject.display.action_window(window.id, :change_state, 'add', 'maximized_vert')
+          sleep 0.25
+
+          window_with_maximized_vert = subject.windows(id: window.id).first
+          expect(window_with_maximized_vert.maximized_vertically?).to be_truthy
+
+          subject.move_resize window_with_maximized_vert, a_geometry
+          expect(subject.windows(id: window.id).first.maximized_vertically?).to be_falsey
+        end
 
         it('can move windows') do
           subject.move(window, x_pos, y_pos)

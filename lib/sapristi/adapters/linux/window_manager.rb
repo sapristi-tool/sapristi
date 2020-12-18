@@ -46,10 +46,17 @@ module Sapristi
         move_resize(window, geometry)
       end
 
-      def move_resize(window, geometry)
+      def move_resize(window, requested)
         remove_extended_hints(window) if window.maximized_horizontally? || window.maximized_vertically?
+
+        geometry = requested.clone
+        left, right, top, bottom = window.frame_extents || [0, 0, 0, 0]
+        geometry[2] -= left + right
+        geometry[3] -= top + bottom
+
         @display.action_window(window.id, :move_resize, GRAVITY, *geometry)
         sleep TIME_TO_APPLY_DIMENSIONS
+        check_expected_geometry window, requested
       end
 
       private
@@ -58,11 +65,28 @@ module Sapristi
 
       def remove_extended_hints(window)
         display.action_window(window.id, :change_state, 'remove', *EXTENDED_HINTS)
+        sleep TIME_TO_APPLY_DIMENSIONS
       end
 
       def complete_geometry(window_id, requested)
         window = @display.windows(id: window_id).first
         Geometry.new(window).merge(requested)
+      end
+
+      LABELS = %w[x y width heigth].freeze
+
+      def check_expected_geometry(window, expected)
+        actual_window = @display.windows(id: window.id).first
+        actual = actual_window.exterior_frame || actual_window.geometry
+
+        unless actual.eql? expected
+          ::Sapristi.logger.warn "Geometry mismatch #{WindowManager.text_diff(actual, expected)}, requested=#{expected}, window=#{window.title}"
+        end
+      end
+
+      def self.text_diff(actual, expected)
+        diffs = 4.times.filter { |index| !expected[index].eql? actual[index] }
+        diffs.map { |diff_index| "#{LABELS[diff_index]}: expected=#{expected[diff_index]}, actual=#{actual[diff_index]}" }.join(', ')
       end
     end
 
