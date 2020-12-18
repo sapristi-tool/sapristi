@@ -3,7 +3,7 @@
 module Sapristi
   class NewProcessWindowDetector
     def initialize
-      @display = WMCtrl.display
+      @display = OSFactory.new.window_manager
       @process_manager = OSFactory.new.process_manager
     end
 
