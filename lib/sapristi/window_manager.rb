@@ -10,7 +10,7 @@ module Sapristi
       @display = OSFactory.new.window_manager
     end
 
-    def_delegators :@display, :windows, :close, :workspaces, :move_resize, :resize, :move
+    def_delegators :@display, :windows, :close, :workspaces, :move_resize, :resize, :move, :to_workspace
 
     def find_window(title_regex)
       @display.windows title: title_regex

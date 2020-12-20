@@ -13,6 +13,7 @@ module Sapristi
       @window_manager.move_resize(window,
                                   [definition.x_position, definition.y_position,
                                    definition.h_size, definition.v_size])
+      @window_manager.to_workspace(window, definition.workspace)
       window
     end
 

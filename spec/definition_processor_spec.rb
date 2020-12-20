@@ -61,18 +61,42 @@ module Sapristi
       let(:y_position) { 200 }
       let(:size_x) { 300 }
       let(:size_y) { 400 }
+      let(:another_workspace) do
+        current = WMCtrl.display.list_desktops.find { |workspace| workspace[:current] }[:id]
+        current.positive? ? current - 1 : current + 1
+      end
 
       let(:definition) do
         Definition.new({ 'Command' => command, 'X-position' => x_position, 'Y-position' => y_position,
-                         'H-size' => size_x, 'V-size' => size_y })
+                         'H-size' => size_x, 'V-size' => size_y, 'Workspace' => another_workspace })
       end
 
       it 'move and resize window' do
         window = subject.process_definition(definition)
 
         actual_geometry = window_manager.windows(id: window.id).first.exterior_frame
-        
+
         expect(actual_geometry).to eq([x_position, y_position, size_x, size_y])
+      ensure
+        window_manager.close(window) if window
+      end
+
+      it 'move and resize window' do
+        window = subject.process_definition(definition)
+
+        actual_geometry = window_manager.windows(id: window.id).first.exterior_frame
+
+        expect(actual_geometry).to eq([x_position, y_position, size_x, size_y])
+      ensure
+        window_manager.close(window) if window
+      end
+
+      it 'move window to workspace' do
+        window = subject.process_definition(definition)
+
+        actual_workspace = window_manager.windows(id: window.id).first.desktop
+
+        expect(actual_workspace).to eq(another_workspace)
       ensure
         window_manager.close(window) if window
       end
