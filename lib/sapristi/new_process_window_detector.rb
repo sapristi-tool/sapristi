@@ -30,7 +30,7 @@ module Sapristi
 
     def wait_for_window(command, timeout_in_seconds)
       program = command.split[0]
-      waiter = process_manager.execute_and_detach command
+      waiter = process_manager.execute_and_detach command, '/tmp/sapristi.stdout', '/tmp/sapristi.stderr'
 
       window = discover_window(waiter, program, timeout_in_seconds)
       return window if window

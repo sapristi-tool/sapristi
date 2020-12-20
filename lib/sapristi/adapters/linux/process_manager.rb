@@ -3,14 +3,23 @@
 module Sapristi
   module Linux
     class ProcessManager
-      def self.execute_and_detach(cmd)
+      def self.execute_and_detach(cmd, out, err)
+        write_log_headers(out, err, cmd)
         process_pid = begin
-          Process.spawn(cmd)
+          Process.spawn(cmd, out: [out, 'a'], err: [err, 'a'])
         rescue StandardError
           raise Error, "Error executing process: #{$ERROR_INFO}"
         end
         ::Sapristi.logger.info "Launch #{cmd.split[0]}, process=#{process_pid}"
         Process.detach process_pid
+      end
+
+      def self.write_log_headers(out, err, header)
+        [out, err].each { |file_name| write_header(file_name, header) }
+      end
+
+      def self.write_header(file_name, header)
+        File.open(file_name, 'a') { |file| file.write "\n\n#{header}\n" }
       end
 
       def self.kill(waiter)
