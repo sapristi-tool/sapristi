@@ -54,18 +54,13 @@ module Sapristi
     end
 
     context 'manipulate window' do
-      let(:window) { double('window') }
-      let(:window_manager) { spy('window_manager') }
-      subject do
-        manager = DefinitionProcessor.new(window_manager)
-        allow(manager).to receive(:get_window).and_return(window)
+      subject { DefinitionProcessor.new(window_manager) }
+      let(:window_manager) { WindowManager.new }
 
-        manager
-      end
-      let(:x_position) { 1 }
-      let(:y_position) { 2 }
-      let(:size_x) { 3 }
-      let(:size_y) { 4 }
+      let(:x_position) { 100 }
+      let(:y_position) { 200 }
+      let(:size_x) { 300 }
+      let(:size_y) { 400 }
 
       let(:definition) do
         Definition.new({ 'Command' => command, 'X-position' => x_position, 'Y-position' => y_position,
@@ -73,9 +68,13 @@ module Sapristi
       end
 
       it 'move and resize window' do
-        subject.process_definition(definition)
+        window = subject.process_definition(definition)
 
-        expect(window_manager).to have_received(:move_resize).with(window, [x_position, y_position, size_x, size_y])
+        actual_geometry = window_manager.windows(id: window.id).first.exterior_frame
+        
+        expect(actual_geometry).to eq([x_position, y_position, size_x, size_y])
+      ensure
+        window_manager.close(window) if window
       end
     end
   end
