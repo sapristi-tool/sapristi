@@ -59,6 +59,11 @@ module Sapristi
         check_expected_geometry window, requested
       end
 
+      def to_workspace(window, workspace)
+        @display.action_window(window.id, :move_to_desktop, workspace)
+        sleep TIME_TO_APPLY_DIMENSIONS
+      end
+
       private
 
       EXTENDED_HINTS = %w[maximized_vert maximized_horz].freeze

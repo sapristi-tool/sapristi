@@ -20,6 +20,7 @@ module Sapristi
         let(:expected_width) { window.geometry[2] - inc_x }
         let(:expected_height) { window.geometry[3] - inc_y }
         let(:window_geometry) { subject.windows.find { |actual_window| actual_window.id.eql? window.id }.geometry }
+        let(:window_workspace) { subject.windows.find { |actual_window| actual_window.id.eql? window.id }.desktop }
 
         before(:each) { @windows = [] }
         after(:each) { @windows.each { |window| subject.close(window) } }
@@ -77,6 +78,21 @@ module Sapristi
           subject.resize(window, expected_width, expected_height)
 
           expect(window_geometry).to eq([x_pos, y_pos, expected_width, expected_height])
+        end
+
+        context('workspace') do
+          it('window is created in workspace 0') do
+            actual_workspace = window.desktop
+
+            # We don't control the number of workspaces in test environment
+            # using a conservative dynamic strategy to change workspace
+            # 0 when posible otherwise try current + 1
+            expected_workspace = actual_workspace.positive? ? actual_workspace - 1 : actual_workspace + 1
+
+            subject.to_workspace(window, expected_workspace)
+
+            expect(window_workspace).to eq(expected_workspace)
+          end
         end
       end
     end
