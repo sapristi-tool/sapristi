@@ -23,6 +23,7 @@ module Sapristi
     def self.populate_options(opts, args)
       opts.banner = 'Usage: sapristi [options]'
       opts.on('-v', '--verbose', 'Verbose mode') { |value| args.verbose = value }
+      opts.on('-g', '--group GROUP', 'Use named group definitions') { |value| args.group = value }
       opts.on('--dry-run', 'Dry run') { |value| args.dry = value }
       opts.on('-f', '--file FILE', 'Read configuration from FILE') { |file| args.file = file }
       opts.on('-h', '--help', 'Prints this help') do

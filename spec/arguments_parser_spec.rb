@@ -7,6 +7,16 @@ module Sapristi
   RSpec.describe ArgumentsParser do
     subject { ArgumentsParser.new }
 
+    it 'can specify a group' do
+      group = 'group'
+      expect(subject.parse(['-g', group]).group).to eq(group)
+      expect(subject.parse(['--group', group]).group).to eq(group)
+    end
+
+    it 'default group is nil' do
+      expect(subject.parse([]).group).to be_nil
+    end
+
     it 'can enable verbose mode' do
       expect(subject.parse(['-v']).verbose).to be_truthy
       expect(subject.parse(['--verbose']).verbose).to be_truthy
