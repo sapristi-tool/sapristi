@@ -28,6 +28,7 @@ module Sapristi
     def build(options)
       @sapristi.verbose! if options.verbose
       @sapristi.dry! if options.dry
+      @sapristi.filter!(options.group) if options.group
     end
 
     def save_stacktrace(error)

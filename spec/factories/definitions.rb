@@ -9,15 +9,18 @@ module Sapristi
         [
           {
             'Title' => nil, 'Command' => 'some', 'Monitor' => nil, 'X-position' => '1',
-            'Y-position' => '2', 'H-size' => '300', 'V-size' => '400', 'Workspace' => '0'
+            'Y-position' => '2', 'H-size' => '300', 'V-size' => '400', 'Workspace' => '0',
+            'Group' => nil
           },
           {
             'Title' => 'some title', 'Command' => nil, 'Monitor' => '6', 'X-position' => '7',
-            'Y-position' => '8', 'H-size' => '900', 'V-size' => '100', 'Workspace' => '0'
+            'Y-position' => '8', 'H-size' => '900', 'V-size' => '100', 'Workspace' => '0',
+            'Group' => nil
           },
           {
             'Title' => 'some title', 'Command' => nil, 'Monitor' => '0', 'X-position' => '10%',
-            'Y-position' => '20%', 'H-size' => '30%', 'V-size' => '40%', 'Workspace' => nil
+            'Y-position' => '20%', 'H-size' => '30%', 'V-size' => '40%', 'Workspace' => nil,
+            'Group' => nil
           }
         ]
       end
@@ -48,13 +51,15 @@ module Sapristi
         width { '100' }
         height { '200' }
         workspace { '0' }
+        group { nil }
 
         attrs { {} }
 
         default_attrs do
           {
             'Title' => title, 'Command' => command, 'Monitor' => monitor, 'X-position' => x_position,
-            'Y-position' => y_position, 'H-size' => width, 'V-size' => height, 'Workspace' => workspace
+            'Y-position' => y_position, 'H-size' => width, 'V-size' => height, 'Workspace' => workspace,
+            'Group' => group
           }
         end
       end

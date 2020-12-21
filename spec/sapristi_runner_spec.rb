@@ -41,6 +41,14 @@ module Sapristi
       subject.run ['--dry-run']
     end
 
+    it 'calls sapristi with a group' do
+      group = 'some'
+      expect_any_instance_of(Sapristi).to receive(:filter!).with(group)
+      allow_any_instance_of(Sapristi).to receive(:run)
+
+      subject.run ['--group', group]
+    end
+
     context 'errors' do
       let(:valid_headers) { %w[Title Command Monitor X-position Y-position H-size V-size Workspace] }
       let(:separator) { ',' }

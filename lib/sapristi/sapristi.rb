@@ -14,6 +14,7 @@ module Sapristi
       check_user_configuration(conf_file)
 
       definitions = @configuration_loader.load(conf_file)
+      definitions = definitions.filter { |definition| definition.group.eql? @group } if @group
 
       process definitions
     end
@@ -37,12 +38,16 @@ module Sapristi
       @dry
     end
 
+    def filter!(group)
+      @group = group
+    end
+
     private
 
     def process(definitions)
       definitions.each_with_index do |definition, index|
         ::Sapristi.logger.info "Process line #{index}: #{definition}"
-        @definition_processor.process_definition(definition) unless @dry
+        @definition_processor.process_definition(definition) unless dry?
       rescue Error => e
         raise Error, "#{e.message}, line=#{index}"
       end

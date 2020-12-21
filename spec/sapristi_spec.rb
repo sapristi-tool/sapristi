@@ -49,5 +49,46 @@ module Sapristi
 
       expect { Sapristi.new.run file_path }.to raise_error Error, /line=0/
     end
+
+    context 'groups' do
+      let(:group) { 'a_group' }
+      let(:another_group) { 'another_group' }
+      let(:definition_no_group) { build(:a_valid_definition) }
+      let(:definition_with_group) { build(:a_valid_definition, attrs: { 'Group' => group }) }
+      let(:definition_with_another_group) { build(:a_valid_definition, attrs: { 'Group' => another_group }) }
+      let(:all) do
+        [definition_no_group, definition_with_group, definition_with_another_group]
+      end
+      let(:definition_processor) { spy(DefinitionProcessor.new) }
+
+      subject do
+        Sapristi.new(definition_processor: definition_processor)
+      end
+
+      let(:file_path) { build(:valid_csv_file_path, rows: all.map(&:raw_definition)) }
+
+      it 'filters definitions by group when option is provided' do
+        subject.filter! group
+
+        subject.run file_path
+
+        expect(definition_processor).to have_received(:process_definition).with(definition_with_group)
+      end
+
+      it 'filters definitions by group when option is provided with another group' do
+        subject.filter! another_group
+
+        subject.run file_path
+
+        expect(definition_processor).to have_received(:process_definition).with(definition_with_another_group)
+      end
+
+      it 'process when no group' do
+        subject.run file_path
+
+        # FIXME : check definitions
+        expect(definition_processor).to have_received(:process_definition).exactly(3).times
+      end
+    end
   end
 end

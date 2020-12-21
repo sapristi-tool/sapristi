@@ -21,7 +21,8 @@ module Sapristi
       HEADERS.map { |key| "#{key}: #{raw_definition[key]}" }.join(', ')
     end
 
-    attr_reader :raw_definition, :monitor, :x_position, :y_position, :v_size, :h_size, :workspace, :command, :title
+    attr_reader :raw_definition, :monitor, :x_position, :y_position, :v_size, :h_size,
+                :workspace, :command, :title, :group
 
     def hash
       state.hash
@@ -42,7 +43,7 @@ module Sapristi
     private
 
     def normalize_variables
-      %w[Title Command X-position Y-position H-size V-size].each do |key|
+      %w[Title Command X-position Y-position H-size V-size Group].each do |key|
         name = key.downcase.gsub(/-/, '_')
         value = AttributeNormalizer.new(key, @raw_definition[key], @monitor).normalize
         instance_variable_set "@#{name}".to_sym, value
@@ -63,7 +64,7 @@ module Sapristi
       raise Error, "No #{geometry_field_nil} specified" if geometry_field_nil
     end
 
-    HEADERS = %w[Title Command Monitor Workspace X-position Y-position H-size V-size].freeze
+    HEADERS = %w[Title Command Monitor Workspace X-position Y-position H-size V-size Group].freeze
 
     def validate_headers(definition)
       headers = definition.keys

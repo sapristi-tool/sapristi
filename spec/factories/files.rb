@@ -19,7 +19,7 @@ module Helper
   end
 end
 
-HEADERS = %w[Title Command Monitor X-position Y-position H-size V-size Workspace].freeze
+HEADERS = Sapristi::Definition::HEADERS
 SEPARATOR = ','
 
 FactoryBot.define do
