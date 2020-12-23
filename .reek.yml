@@ -5,3 +5,6 @@ detectors:
   UncommunicativeVariableName:
     accept:
     - e
+
+  UtilityFunction:
+    public_methods_only: true
