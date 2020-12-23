@@ -39,7 +39,7 @@ module Sapristi
     def apply_percentage
       validate_percentage_field
 
-      (monitor_absolute * percentage).to_i + offset
+      (monitor_absolute * percentage - 1).to_i + offset
     end
 
     def offset
