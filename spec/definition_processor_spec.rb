@@ -14,7 +14,7 @@ module Sapristi
         definition = build(:a_valid_definition, attrs: { 'Command' => command, 'Title' => nil })
         DefinitionProcessor.new(spy('window_manager'), window_detector).process_definition(definition)
 
-        expect(window_detector).to have_received(:detect_window_for_process).with(command)
+        expect(window_detector).to have_received(:detect_window_for_process).with(command, nil)
       end
 
       let(:window_manager) { spy('window_manager') }
@@ -38,8 +38,8 @@ module Sapristi
         end
 
         let(:launcher) { NewProcessWindowDetector.new }
-        let!(:a_window) { launcher.detect_window_for_process command }
-        let!(:another_window) { launcher.detect_window_for_process command }
+        let!(:a_window) { launcher.detect_window_for_process command, nil }
+        let!(:another_window) { launcher.detect_window_for_process command, nil }
         it('when more than one window have the same title') do
           duplicated_title = /Klondike/
           expect do

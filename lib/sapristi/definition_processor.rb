@@ -21,7 +21,7 @@ module Sapristi
 
     def get_window(title, command)
       (title && find_one_by_title(title)) ||
-        (command && @process_manager.detect_window_for_process(command)) ||
+        (command && @process_manager.detect_window_for_process(command, title)) ||
         raise(Error, "Couldn't produce a window for this definition")
     end
 

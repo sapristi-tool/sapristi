@@ -20,6 +20,7 @@ module Sapristi
       end
     end
 
+    # This method smells of :reek:TooManyStatements
     def self.populate_options(opts, args)
       opts.banner = 'Usage: sapristi [options]'
       opts.on('-v', '--verbose', 'Verbose mode') { |value| args.verbose = value }

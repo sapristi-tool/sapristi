@@ -16,7 +16,7 @@ module Sapristi
         subject { WindowManager.new }
 
         let(:command) { 'gedit -s --new-window' }
-        let(:window) { @windows.push(NewProcessWindowDetector.new.detect_window_for_process(command)).first }
+        let(:window) { @windows.push(NewProcessWindowDetector.new.detect_window_for_process(command, nil)).first }
         let(:expected_width) { window.geometry[2] - inc_x }
         let(:expected_height) { window.geometry[3] - inc_y }
         let(:window_geometry) { subject.windows.find { |actual_window| actual_window.id.eql? window.id }.geometry }

@@ -6,11 +6,11 @@ module Sapristi
       def self.execute_and_detach(cmd, out, err)
         write_log_headers(out, err, cmd)
         process_pid = begin
-          Process.spawn(cmd, out: [out, 'a'], err: [err, 'a'])
+          Process.spawn(cmd, out: [out, 'a'], err: [err, 'a'], pgroup: Process.getpgrp)
         rescue StandardError
           raise Error, "Error executing process: #{$ERROR_INFO}"
         end
-        ::Sapristi.logger.info "Launch #{cmd.split[0]}, process=#{process_pid}"
+        ::Sapristi.logger.info "Launch #{cmd.split[0]}, process=#{process_pid} pgroup=#{Process.getpgrp}"
         Process.detach process_pid
       end
 
