@@ -15,7 +15,7 @@ module Sapristi
     end
 
     after(:each) do
-      @windows.compact.each { |w| WindowManager.new.close w }
+      @windows.compact.each { |window| WindowManager.new.close window }
       @waiters.each do |waiter|
         Process.kill(9, waiter.pid) if waiter.alive?
         sleep kill_sleep_time
@@ -52,7 +52,7 @@ module Sapristi
       let(:command) { 'gedit --new-window' }
       def launch_external
         pid = Process.spawn command, pgroup: true
-        waiter = Process.detach pid
+        Process.detach pid
         start_date = Time.now
 
         while Time.now - start_date < timeout

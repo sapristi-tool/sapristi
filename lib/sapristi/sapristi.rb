@@ -19,9 +19,7 @@ module Sapristi
       process definitions
     end
 
-    def verbose?
-      @verbose
-    end
+    attr_reader :dry, :verbose
 
     def verbose!
       @verbose = true
@@ -34,10 +32,6 @@ module Sapristi
       logger.level = :info if logger.level > Logger::INFO
     end
 
-    def dry?
-      @dry
-    end
-
     def filter!(group)
       @group = group
     end
@@ -46,11 +40,15 @@ module Sapristi
 
     def process(definitions)
       definitions.each_with_index do |definition, index|
-        ::Sapristi.logger.info "Process line #{index}: #{definition}"
-        @definition_processor.process_definition(definition) unless dry?
+        process_line(definition, index)
       rescue Error => e
         raise Error, "#{e.message}, line=#{index}"
       end
+    end
+
+    def process_line(definition, index)
+      ::Sapristi.logger.info "Process line #{index}: #{definition}"
+      @definition_processor.process_definition(definition) unless dry
     end
 
     def check_user_configuration(conf_file)
