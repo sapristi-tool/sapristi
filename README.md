@@ -3,35 +3,49 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/e168b7940a847148f617/maintainability)](https://codeclimate.com/github/sapristi-tool/sapristi/maintainability)
 ![Ruby](https://github.com/sapristi-tool/sapristi/workflows/Ruby/badge.svg)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/sapristi`. To experiment with that code, run `bin/console` for an interactive prompt.
+An efficient tool to control your multi-monitor, multi-workspace enviroment. Just define your favorite working arragement in ~/sapristi.csv  and execute `sapristi` to load your applications and align them in your favorite fashion.
 
-TODO: Delete this and the text above, and describe your gem
+## Requirements
+
+Linux
+
+ruby-wmctrl gem:
+  `libx11-dev libglib2.0-dev libxmu-dev`
+
+Ruby/GTK gem
+
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'sapristi'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install sapristi
+    `$ gem install sapristi`
 
 ## Usage
 
-TODO: Write usage instructions here
+`sapristi` loads your definitions.
 
-## Development
+`sapristi  -v | --verbose` verbose mode.
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+`sapristi --dry-run` dry mode, show your definitions but it doesn't execute them.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+`sapristi -f FILE` load your definitions from another file.
+
+`sapristi -g group` load definitions tagged with group.
+
+
+### Configuration example: ~/.sapristi.csv
+
+| Title | Command                                                                         | Monitor | X-position | Y-position | H-size | V-size | Workspace | Group    |
+|-------|---------------------------------------------------------------------------------|---------|------------|------------|--------|--------|-----------|----------|
+|       | subl ~/projects/ruby/sapristi                                                   |         | 0          | 0          | 60%    | 100%   | 0         | sapristi |
+|       | terminator --working-directory=~/projects/ruby/sapristi                         |         | 60%        | 0          | 40%    | 50%    | 0         | sapristi |
+|       | zeal                                                                            |         | 60%        | 50%        | 40%    | 50%    | 0         | sapristi |
+|       | subl ~/projects/python/stuff                                                    |         | 0          | 0          | 60%    | 100%   | 1         | python   |
+|       | terminator --working-directory=~/projects/python/stuff                          |         | 60%        | 0          | 40%    | 50%    | 1         | python   |
+|       | firefox --new-window https://docs.python.org/3/index.html                       |         | 60%        | 50%        | 40%    | 50%    | 1         | python   |
+|       | firefox --new-window https://www.gmail.com                                      |         | 0          | 0          | 50%    | 100%   | 2         | social   |
+|       | firefox --new-window https://www.slack.com                                      |         | 50%        | 0          | 50%    | 50%    | 2         | social   |
+|       | firefox --new-window https://www.twitter.com                                    |         | 50%        |            | 50%    | 50%    | 2         | social   |
+|       | sol                                                                             | DP-2    | 0          | 0          | 100%   | 100%   | 3         | games    |
 
 ## Contributing
 
