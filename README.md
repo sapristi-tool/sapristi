@@ -34,7 +34,7 @@ Ruby/GTK gem
 
 ### Configuration example: ~/.sapristi.csv
 
-| Title | Command                                                                         | Monitor | X-position | Y-position | H-size | V-size | Workspace | Group    |
+| Title | Command                                                                         | Monitor | X          | Y          | Width  | Height | Workspace | Group    |
 |-------|---------------------------------------------------------------------------------|---------|------------|------------|--------|--------|-----------|----------|
 |       | subl ~/projects/ruby/sapristi                                                   |         | 0          | 0          | 60%    | 100%   | 0         | sapristi |
 |       | terminator --working-directory=~/projects/ruby/sapristi                         |         | 60%        | 0          | 40%    | 50%    | 0         | sapristi |
