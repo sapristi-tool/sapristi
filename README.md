@@ -14,13 +14,13 @@ An efficient tool to control your multi-monitor, multi-workspace enviroment. Jus
 
 `sapristi` load definitions from default configuration file (~/.sapristi.csv) If default configuration file is not found, it will create an empty one.
 
-  `-f FILE` load your definitions from another file, ie: sapristi -f ~/machine_learning_definitions.csv
+  > `-f FILE` load your definitions from another file, ie: sapristi -f ~/machine_learning_definitions.csv
 
-  `-v | --verbose` verbose mode.
+  > `-v | --verbose` verbose mode.
 
-  `--dry-run` dry mode, show your definitions but it doesn't execute them.
+  > `--dry-run` dry mode, show your definitions but it doesn't execute them.
 
-  `-g|--group name` load definitions tagged with group, ie: sapristi -g social
+  > `-g|--group name` load definitions tagged with group, ie: sapristi -g social
 
 
 ### Configuration example: ~/.sapristi.csv
