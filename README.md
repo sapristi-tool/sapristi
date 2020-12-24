@@ -1,7 +1,6 @@
 # Sapristi
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/e168b7940a847148f617/maintainability)](https://codeclimate.com/github/sapristi-tool/sapristi/maintainability)
-![Ruby](https://github.com/sapristi-tool/sapristi/workflows/Ruby/badge.svg)
 
 ![Sapristi image](/assets/images/sapristi.jpg)
 
