@@ -46,9 +46,9 @@ module Sapristi
       work_area = monitor['work_area']
 
       case key
-      when 'X-position'
+      when 'X'
         work_area[0]
-      when 'Y-position'
+      when 'Y'
         work_area[1]
       else
         0
@@ -66,7 +66,7 @@ module Sapristi
     end
 
     def validate_percentage_field
-      min_percentage = { 'V-size' => 0.05, 'H-size' => 0.05 }.fetch(key, 0)
+      min_percentage = { 'Height' => 0.05, 'Width' => 0.05 }.fetch(key, 0)
       unless Definition::TRANSLATIONS.include? key
         raise "#{key}=#{raw}, using percentage in invalid field, valid=#{Definition::TRANSLATIONS.keys.join(', ')}"
       end

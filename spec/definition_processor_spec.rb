@@ -67,8 +67,8 @@ module Sapristi
       end
 
       let(:definition) do
-        Definition.new({ 'Command' => command, 'X-position' => x_position, 'Y-position' => y_position,
-                         'H-size' => size_x, 'V-size' => size_y, 'Workspace' => another_workspace })
+        Definition.new({ 'Command' => command, 'X' => x_position, 'Y' => y_position,
+                         'Width' => size_x, 'Height' => size_y, 'Workspace' => another_workspace })
       end
 
       it 'move and resize window' do

@@ -64,7 +64,6 @@ module Sapristi
 
         window = windows.first
         @windows.push window
-        puts "EXTERNAL WINDOW id=#{window.id}, pid=#{window.pid} pgroupid=#{Process.getpgid window.pid}, my group=#{Process.getpgrp}"
         window
       end
 

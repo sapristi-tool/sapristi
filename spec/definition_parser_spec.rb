@@ -68,20 +68,20 @@ RSpec.describe DefinitionParser do
     end
 
     it 'when any of the geometry values is not defined' do
-      %w[H-size V-size X-position Y-position].each do |key|
+      %w[Width Height X Y].each do |key|
         definition_attrs = build(:valid_hash, attrs: { key => nil })
         expect { subject.parse definition_attrs }.to raise_error(Error, /No #{key} specified/)
       end
     end
 
-    let(:definition_with_x_after_monitor_width) { build(:valid_hash, attrs: { 'X-position' => monitor_width }) }
+    let(:definition_with_x_after_monitor_width) { build(:valid_hash, attrs: { 'X' => monitor_width }) }
     it 'when fixed x > monitor width' do
       x_range = "0..#{monitor_width - 1}"
       expect { subject.parse definition_with_x_after_monitor_width }
         .to raise_error(Error, /x=#{monitor_width} is outside of monitor width dimension=#{x_range}/)
     end
 
-    let(:definition_with_y_after_monitor_length) { build(:valid_hash, attrs: { 'Y-position' => monitor_height }) }
+    let(:definition_with_y_after_monitor_length) { build(:valid_hash, attrs: { 'Y' => monitor_height }) }
     it 'when fixed y > monitor length' do
       y_range = "0..#{monitor_height - 1}"
       expect { subject.parse definition_with_y_after_monitor_length }
@@ -90,7 +90,7 @@ RSpec.describe DefinitionParser do
 
     it 'when fixed x < 0' do
       x_pos = -1
-      definition_attrs = build(:valid_hash, attrs: { 'X-position' => x_pos })
+      definition_attrs = build(:valid_hash, attrs: { 'X' => x_pos })
 
       expect { subject.parse definition_attrs }
         .to raise_error(Error, /x=#{x_pos} is outside of monitor width dimension=0..#{monitor_width - 1}/)
@@ -98,7 +98,7 @@ RSpec.describe DefinitionParser do
 
     it 'when fixed y < 0' do
       y_pos = -1
-      definition_attrs = build(:valid_hash, attrs: { 'Y-position' => y_pos })
+      definition_attrs = build(:valid_hash, attrs: { 'Y' => y_pos })
 
       expect { subject.parse definition_attrs }
         .to raise_error(Error, /y=#{y_pos} is outside of monitor height dimension=0..#{monitor_height - 1}/)
@@ -112,7 +112,7 @@ RSpec.describe DefinitionParser do
     let(:dimensions_y) { "\\[#{y_pos}, #{y_pos + y_size}\\]" }
 
     it 'when x + width > monitor width' do
-      definition_attrs = build(:valid_hash, attrs: { 'X-position' => x_pos, 'H-size' => x_size })
+      definition_attrs = build(:valid_hash, attrs: { 'X' => x_pos, 'Width' => x_size })
 
       valid = "\\[0..#{monitor_width - 1}\\]"
       expect { subject.parse definition_attrs }
@@ -120,7 +120,7 @@ RSpec.describe DefinitionParser do
     end
 
     it 'when y + length > monitor length' do
-      definition_attrs = build(:valid_hash, attrs: { 'Y-position' => y_pos, 'V-size' => y_size })
+      definition_attrs = build(:valid_hash, attrs: { 'Y' => y_pos, 'Height' => y_size })
 
       valid = "\\[0..#{monitor_height - 1}\\]"
       expect { subject.parse definition_attrs }
@@ -128,20 +128,20 @@ RSpec.describe DefinitionParser do
     end
 
     it 'when witdh < 50' do
-      definition_attrs = build(:valid_hash, attrs: { 'H-size' => 49 })
+      definition_attrs = build(:valid_hash, attrs: { 'Width' => 49 })
       expect { subject.parse definition_attrs }.to raise_error(Error, /window x size=49 less than 50/)
     end
 
     it 'when length < 50' do
-      definition_attrs = build(:valid_hash, attrs: { 'V-size' => 49 })
+      definition_attrs = build(:valid_hash, attrs: { 'Height' => 49 })
       expect { subject.parse definition_attrs }.to raise_error(Error, /window y size=49 less than 50/)
     end
 
     context('percentages') do
-      include_examples 'geometry percentage', 'X-position', 0
-      include_examples 'geometry percentage', 'Y-position', 0
-      include_examples 'geometry percentage', 'H-size'
-      include_examples 'geometry percentage', 'V-size'
+      include_examples 'geometry percentage', 'X', 0
+      include_examples 'geometry percentage', 'Y', 0
+      include_examples 'geometry percentage', 'Width'
+      include_examples 'geometry percentage', 'Height'
     end
 
     it 'when no command and no title specified' do
@@ -177,7 +177,7 @@ RSpec.describe DefinitionParser do
     it 'numeric fields are integers' do
       definition = Definition.new build(:valid_hash)
 
-      %w[x_position y_position h_size v_size workspace].each do |field|
+      %w[x y width height workspace].each do |field|
         expect(definition.send(field)).to be_instance_of Integer
       end
     end

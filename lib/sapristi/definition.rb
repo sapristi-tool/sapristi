@@ -3,8 +3,8 @@
 module Sapristi
   class Definition
     TRANSLATIONS = {
-      'H-size' => 'work_area_width', 'V-size' => 'work_area_height',
-      'X-position' => 'work_area_width', 'Y-position' => 'work_area_height'
+      'Width' => 'work_area_width', 'Height' => 'work_area_height',
+      'X' => 'work_area_width', 'Y' => 'work_area_height'
     }.freeze
     NUMERIC_FIELDS = (TRANSLATIONS.keys + %w[Workspace]).freeze
 
@@ -21,7 +21,7 @@ module Sapristi
       HEADERS.map { |key| "#{key}: #{raw_definition[key]}" }.join(', ')
     end
 
-    attr_reader :raw_definition, :monitor, :x_position, :y_position, :v_size, :h_size,
+    attr_reader :raw_definition, :monitor, :x, :y, :height, :width,
                 :workspace, :command, :title, :group
 
     def hash
@@ -43,7 +43,7 @@ module Sapristi
     private
 
     def normalize_variables
-      %w[Title Command X-position Y-position H-size V-size Group].each do |key|
+      %w[Title Command X Y Width Height Group].each do |key|
         name = key.downcase.gsub(/-/, '_')
         value = AttributeNormalizer.new(key, @raw_definition[key], @monitor).normalize
         instance_variable_set "@#{name}".to_sym, value
@@ -60,11 +60,11 @@ module Sapristi
     end
 
     def validate_geometry(definition)
-      geometry_field_nil = %w[H-size V-size X-position Y-position].find { |key| definition[key].nil? }
+      geometry_field_nil = %w[Width Height X Y].find { |key| definition[key].nil? }
       raise Error, "No #{geometry_field_nil} specified" if geometry_field_nil
     end
 
-    HEADERS = %w[Title Command Monitor Workspace X-position Y-position H-size V-size Group].freeze
+    HEADERS = %w[Title Command Monitor Workspace X Y Width Height Group].freeze
 
     def validate_headers(definition)
       headers = definition.keys

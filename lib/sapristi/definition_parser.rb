@@ -31,8 +31,8 @@ module Sapristi
     end
 
     def validate_monitor_dimensions(normalized, monitor_width, monitor_height)
-      x_pos = normalized.x_position
-      y_pos = normalized.y_position
+      x_pos = normalized.x
+      y_pos = normalized.y
       unless (0...monitor_width).include? x_pos
         raise Error, "x=#{x_pos} is outside of monitor width dimension=0..#{monitor_width - 1}"
       end
@@ -42,10 +42,10 @@ module Sapristi
     end
 
     def validate_work_area(normalized, monitor_width, monitor_height)
-      x_pos = normalized.x_position
-      y_pos = normalized.y_position
-      x_end = x_pos + normalized.h_size
-      y_end = y_pos + normalized.v_size
+      x_pos = normalized.x
+      y_pos = normalized.y
+      x_end = x_pos + normalized.width
+      y_end = y_pos + normalized.height
       if x_end >= monitor_width
         raise Error, "window x dimensions: [#{x_pos}, #{x_end}] exceeds monitor width [0..#{monitor_width - 1}]"
       end
@@ -57,8 +57,8 @@ module Sapristi
     MIN_X_SIZE = 50
     MIN_Y_SIZE = 50
     def validate_window_min_size(normalized)
-      window_width = normalized.h_size
-      window_height = normalized.v_size
+      window_width = normalized.width
+      window_height = normalized.height
       raise Error, "window x size=#{window_width} less than #{MIN_X_SIZE}" if window_width < MIN_X_SIZE
       raise Error, "window y size=#{window_height} less than #{MIN_Y_SIZE}" if window_height < MIN_Y_SIZE
     end
