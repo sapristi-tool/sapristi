@@ -44,6 +44,21 @@ The configuration file is a CSV file (comma delimited, no separator). First line
  - Which workspace: __Workspace__
  - Desired window geometry: __X__, __Y__, __Width__, __Height__
 
+The table above represents a CSV file like the one below:
+```
+Title,Command,Monitor,X,Y,Width,Height,Workspace
+,subl ~/projects/ruby/sapristi,0,0,60%,100%,0,sapristi
+,terminator --working-directory=~/projects/ruby/sapristi,60%,0,40%,50%,0,sapristi
+,zeal,60%,50%,40%,50%,0,sapristi
+,subl ~/projects/python/stuff,0,0,60%,100%,1,python
+,terminator --working-directory=~/projects/python/stuff,60%,0,40%,50%,1,python
+,firefox --new-window https://docs.python.org/3/index.html,60%,50%,40%,50%,1,python
+,firefox --new-window https://www.gmail.com,0,0,50%,100%,2,social
+,firefox --new-window https://www.slack.com,50%,0,50%,50%,2,social
+,firefox --new-window https://www.twitter.com,50%,50%,50%,2,social
+,sol,DP-2,0,0,100%,100%,3,games
+```
+
 
 #### Fields:
 
