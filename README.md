@@ -6,20 +6,13 @@
 
 An efficient tool to control your multi-monitor, multi-workspace enviroment. Just define your favorite working arragement in ~/sapristi.csv  and execute `sapristi` to load your applications and align them in your favorite fashion.
 
-## Requirements
-
-Linux
-
-See ruby-wmctrl (`libx11-dev libglib2.0-dev libxmu-dev`) and Ruby/GTK gem requirements.
-
-
 ## Installation
 
     `$ gem install sapristi`
 
 ## Usage
 
-`sapristi` load definitions from default configuration file (~/.sapristi.csv)
+`sapristi` load definitions from default configuration file (~/.sapristi.csv) If default configuration file is not found, it will create an empty one.
 
 `sapristi -f FILE` load your definitions from another file, ie: sapristi -f ~/machine_learning_definitions.csv
 
@@ -27,7 +20,7 @@ See ruby-wmctrl (`libx11-dev libglib2.0-dev libxmu-dev`) and Ruby/GTK gem requir
 
 `sapristi --dry-run` dry mode, show your definitions but it doesn't execute them.
 
-`sapristi -g group` load definitions tagged with group, ie: sapristi -g social
+`sapristi -g|--group name` load definitions tagged with group, ie: sapristi -g social
 
 
 ### Configuration example: ~/.sapristi.csv
@@ -70,6 +63,11 @@ Every line has to define a __Title__, a __Command__ or both
 
 - __Workspace__: (Optional, workspace number: 0, n - 1) Move window to __Workspace__ if defined, otherwise leave it in current workspace.
 
+## Requirements
+
+Linux
+
+See ruby-wmctrl (`libx11-dev libglib2.0-dev libxmu-dev`) and Ruby/GTK gem requirements.
 
 ## Contributing
 
