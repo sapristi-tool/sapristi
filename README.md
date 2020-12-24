@@ -3,6 +3,8 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/e168b7940a847148f617/maintainability)](https://codeclimate.com/github/sapristi-tool/sapristi/maintainability)
 ![Ruby](https://github.com/sapristi-tool/sapristi/workflows/Ruby/badge.svg)
 
+![Sapristi image](/assets/images/sapristi.png)
+
 An efficient tool to control your multi-monitor, multi-workspace enviroment. Just define your favorite working arragement in ~/sapristi.csv  and execute `sapristi` to load your applications and align them in your favorite fashion.
 
 ## Requirements
@@ -74,3 +76,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/sapris
 ## License
 
 Please see [LICENSE](https://github.com/sapristi-tool/sapristi/blob/master/LICENSE.txt) for personal usage and [COMM-LICENSE](https://github.com/sapristi-tool/sapristi/blob/master/COMM-LICENSE.txt) for commercial usage.
+
+## Credits
+<span>Photo by <a href="https://unsplash.com/@danfreemanphoto?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Dan Freeman</a> on <a href="https://unsplash.com/?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
