@@ -45,7 +45,7 @@ See ruby-wmctrl (`libx11-dev libglib2.0-dev libxmu-dev`) and Ruby/GTK gem requir
 |       | firefox --new-window https://www.twitter.com                                    |         | 50%        |            | 50%    | 50%    | 2         | social   |
 |       | sol                                                                             | DP-2    | 0          | 0          | 100%   | 100%   | 3         | games    |
 
-####Fields:
+#### Fields:
 
 - __Title__: (Optional, regex). If defined, sapristi will try to find a window with a title that matches the provided regular expression.
 
