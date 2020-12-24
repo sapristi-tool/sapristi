@@ -9,10 +9,7 @@ An efficient tool to control your multi-monitor, multi-workspace enviroment. Jus
 
 Linux
 
-ruby-wmctrl gem:
-  `libx11-dev libglib2.0-dev libxmu-dev`
-
-Ruby/GTK gem
+See ruby-wmctrl (`libx11-dev libglib2.0-dev libxmu-dev`) and Ruby/GTK gem requirements.
 
 
 ## Installation
@@ -34,7 +31,7 @@ Ruby/GTK gem
 
 ### Configuration example: ~/.sapristi.csv
 
-| Title | Command                                                                         | Monitor | X          | Y          | Width  | Height | Workspace | Group    |
+| __Title__ | __Command__                                                                         | __Monitor__ | __X__          | __Y__          | __Width__  | __Height__ | __Workspace__ | __Group__    |
 |-------|---------------------------------------------------------------------------------|---------|------------|------------|--------|--------|-----------|----------|
 |       | subl ~/projects/ruby/sapristi                                                   |         | 0          | 0          | 60%    | 100%   | 0         | sapristi |
 |       | terminator --working-directory=~/projects/ruby/sapristi                         |         | 60%        | 0          | 40%    | 50%    | 0         | sapristi |
@@ -46,6 +43,29 @@ Ruby/GTK gem
 |       | firefox --new-window https://www.slack.com                                      |         | 50%        | 0          | 50%    | 50%    | 2         | social   |
 |       | firefox --new-window https://www.twitter.com                                    |         | 50%        |            | 50%    | 50%    | 2         | social   |
 |       | sol                                                                             | DP-2    | 0          | 0          | 100%   | 100%   | 3         | games    |
+
+Fields:
+
+__Title__: (Optional, regex). If defined, sapristi will try to find a window with a title that matches the provided regular expression.
+
+__Command__: (Optional, a command) If __Title__ is non provided or there isn't a window that matches __Title__, sapristi will execute __Command__.
+Every line has to define a __Title__, a __Command__ or both
+
+__Monitor__ (Optional, monitor name):
+  - Use monitor when specified.
+  - Use main monitor if monitor name is not found.
+  - Use main monitor if __Monitor__ is not provided.
+  
+__X__: (Mandatory, absolute or relative) X position to position the window, it can be absolute (200) or relative (20%) Monitor work area, not monitor resolution.
+
+__Y__: (Mandatory, absolute or relative) Y position to position the window, it can be absolute (300) or relative (30%) Monitor work area, not monitor resolution.
+
+__Width__: (Mandatory, absolute or relative) Window width, it can be absolute (400) or relative (40%) Monitor work area, not monitor resolution.
+
+__Height__: (Mandatory, absolute or relative) Window height, it can be absolute (400) or relative (40%) Monitor work area, not monitor resolution.
+
+__Workspace__: (Optional, workspace number: 0, n - 1) Move window to __Workspace__ if defined, otherwise leave it in current workspace.
+
 
 ## Contributing
 
