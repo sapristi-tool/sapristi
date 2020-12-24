@@ -45,11 +45,14 @@ See ruby-wmctrl (`libx11-dev libglib2.0-dev libxmu-dev`) and Ruby/GTK gem requir
 |       | firefox --new-window https://www.twitter.com                                    |         | 50%        |            | 50%    | 50%    | 2         | social   |
 |       | sol                                                                             | DP-2    | 0          | 0          | 100%   | 100%   | 3         | games    |
 
+The configuration file is a CSV file (comma delimited, no separator) with a header line.
+Each line defines how to execute a program (or pick an existing window) and position the window where ever you want in your fancy multi monitor, multi workspace environment.
+
 #### Fields:
 
-- __Title__: (Optional, regex). If defined, sapristi will try to find a window with a title that matches the provided regular expression.
+- __Title__: (Optional, regex). If defined, sapristi will try to find a window whose title matches the regular expression.
 
-- __Command__: (Optional, a command) If __Title__ is non provided or there isn't a window that matches __Title__, sapristi will execute __Command__.
+- __Command__: (Optional, a command) If __Title__ is not provided or there isn't a window that matches it, sapristi will execute __Command__.
 Every line has to define a __Title__, a __Command__ or both
 
 - __Monitor__ (Optional, monitor name):
