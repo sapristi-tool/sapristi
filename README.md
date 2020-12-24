@@ -18,15 +18,15 @@ See ruby-wmctrl (`libx11-dev libglib2.0-dev libxmu-dev`) and Ruby/GTK gem requir
 
 ## Usage
 
-`sapristi` loads your definitions.
+`sapristi` load definitions from default configuration file (~/.sapristi.csv)
+
+`sapristi -f FILE` load your definitions from another file, ie: sapristi -f ~/machine_learning_definitions.csv
 
 `sapristi  -v | --verbose` verbose mode.
 
 `sapristi --dry-run` dry mode, show your definitions but it doesn't execute them.
 
-`sapristi -f FILE` load your definitions from another file.
-
-`sapristi -g group` load definitions tagged with group.
+`sapristi -g group` load definitions tagged with group, ie: sapristi -g social
 
 
 ### Configuration example: ~/.sapristi.csv
