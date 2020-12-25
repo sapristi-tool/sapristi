@@ -8,6 +8,12 @@ An efficient tool to control your multi-monitor, multi-workspace enviroment. Jus
 
 ## Installation
 
+Install build dependencies
+
+    `$ sudo apt install build-essential ruby-dev libx11-dev libglib2.0-dev libxmu-dev libgtk-3-dev`
+
+Install gem
+
     `$ gem install sapristi`
 
 ## Usage
@@ -96,7 +102,7 @@ Every line has to define a __Title__, a __Command__ or both. Examples:
 
 Linux
 
-See ruby-wmctrl (`libx11-dev libglib2.0-dev libxmu-dev`) and Ruby/GTK gem requirements.
+See ruby-wmctrl (`libx11-dev libglib2.0-dev libxmu-dev`) and Ruby/GTK (`libgtk-3-dev`) gem requirements.
 
 ## Caveats
 
