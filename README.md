@@ -1,6 +1,6 @@
 # Sapristi
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/e168b7940a847148f617/maintainability)](https://codeclimate.com/github/sapristi-tool/sapristi/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/e168b7940a847148f617/maintainability)](https://codeclimate.com/github/sapristi-tool/sapristi/maintainability) ![Gem](https://img.shields.io/gem/v/sapristi?style=plastic)
 
 ![Sapristi image](/assets/images/sapristi.jpg)
 
