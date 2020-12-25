@@ -33,16 +33,16 @@ Install gem
 
 | __Title__ | __Command__                                                                         | __Monitor__ | __X__          | __Y__          | __Width__  | __Height__ | __Workspace__ | __Group__    |
 |-------|---------------------------------------------------------------------------------|---------|------------|------------|--------|--------|-----------|----------|
-|       | subl ~/projects/ruby/sapristi                                                   |         | 0          | 0          | 60%    | 100%   | 0         | sapristi |
-|       | terminator --working-directory=~/projects/ruby/sapristi                         |         | 60%        | 0          | 40%    | 50%    | 0         | sapristi |
+|       | subl ~/projects/ruby/sapristi                                                   |         | 0%         | 0%         | 60%    | 100%   | 0         | sapristi |
+|       | terminator --working-directory=~/projects/ruby/sapristi                         |         | 60%        | 0%         | 40%    | 50%    | 0         | sapristi |
 |       | zeal                                                                            |         | 60%        | 50%        | 40%    | 50%    | 0         | sapristi |
-|       | subl ~/projects/python/stuff                                                    |         | 0          | 0          | 60%    | 100%   | 1         | python   |
-|       | terminator --working-directory=~/projects/python/stuff                          |         | 60%        | 0          | 40%    | 50%    | 1         | python   |
+|       | subl ~/projects/python/stuff                                                    |         | 0%         | 0%         | 60%    | 100%   | 1         | python   |
+|       | terminator --working-directory=~/projects/python/stuff                          |         | 60%        | 0%         | 40%    | 50%    | 1         | python   |
 |       | firefox --new-window https://docs.python.org/3/index.html                       |         | 60%        | 50%        | 40%    | 50%    | 1         | python   |
-|       | firefox --new-window https://www.gmail.com                                      |         | 0          | 0          | 50%    | 100%   | 2         | social   |
-|       | firefox --new-window https://www.slack.com                                      |         | 50%        | 0          | 50%    | 50%    | 2         | social   |
-|       | firefox --new-window https://www.twitter.com                                    |         | 50%        |            | 50%    | 50%    | 2         | social   |
-|       | sol                                                                             | DP-2    | 0          | 0          | 100%   | 100%   | 3         | games    |
+|       | firefox --new-window https://www.gmail.com                                      |         | 0%         | 0%         | 50%    | 100%   | 2         | social   |
+|       | firefox --new-window https://www.slack.com                                      |         | 50%        | 0%         | 50%    | 50%    | 2         | social   |
+|       | firefox --new-window https://www.twitter.com                                    |         | 50%        | 0%         | 50%    | 50%    | 2         | social   |
+|       | sol                                                                             | DP-2    | 0%         | 0%         | 100%   | 100%   | 3         | games    |
 
 The configuration file is a CSV file (comma delimited, no separator). First line is the header line, next lines are definitions. Each definition prescribes:
  - How choose a window from the current ones, or how to launch a program to produce the window: __Title__, __Command__
@@ -52,17 +52,17 @@ The configuration file is a CSV file (comma delimited, no separator). First line
 
 The table above represents a CSV file like the one below:
 ```
-Title,Command,Monitor,X,Y,Width,Height,Workspace
-,subl ~/projects/ruby/sapristi,0,0,60%,100%,0,sapristi
-,terminator --working-directory=~/projects/ruby/sapristi,60%,0,40%,50%,0,sapristi
-,zeal,60%,50%,40%,50%,0,sapristi
-,subl ~/projects/python/stuff,0,0,60%,100%,1,python
-,terminator --working-directory=~/projects/python/stuff,60%,0,40%,50%,1,python
-,firefox --new-window https://docs.python.org/3/index.html,60%,50%,40%,50%,1,python
-,firefox --new-window https://www.gmail.com,0,0,50%,100%,2,social
-,firefox --new-window https://www.slack.com,50%,0,50%,50%,2,social
-,firefox --new-window https://www.twitter.com,50%,50%,50%,2,social
-,sol,DP-2,0,0,100%,100%,3,games
+Title,Command,Monitor,X,Y,Width,Height,Workspace,Group
+,subl ~/projects/ruby/sapristi,,0%,0%,60%,100%,0,sapristi
+,terminator --working-directory=~/projects/ruby/sapristi,,60%,0%,40%,50%,0,sapristi
+,zeal,,60%,50%,40%,50%,0,sapristi
+,subl ~/projects/python/stuff,,0%,0%,60%,100%,1,python
+,terminator --working-directory=~/projects/python/stuff,,60%,0%,40%,50%,1,python
+,firefox --new-window https://docs.python.org/3/index.html,,60%,50%,40%,50%,1,python
+,firefox --new-window https://www.gmail.com,,0%,0%,50%,100%,2,social
+,firefox --new-window https://www.slack.com,,50%,0%,50%,50%,2,social
+,firefox --new-window https://www.twitter.com,,50%,50%,50%,50%,2,social
+,sol,DP-2,0%,0%,100%,100%,3,games
 ```
 
 
