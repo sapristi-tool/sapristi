@@ -73,24 +73,27 @@ Title,Command,Monitor,X,Y,Width,Height,Workspace,Group
   - Twitter.+Firefox
   - System Monitor
 
-- __Command__(optional): A command. If __Title__ is not provided or there isn't a window that matches it, sapristi will execute __Command__.
-Every line has to define a __Title__, a __Command__ or both. Examples:
+- __Command__(optional): A command. If __Title__ is not provided or there isn't a window that matches it, sapristi will execute __Command__. Examples:
   - firefox --new-window https://www.twitter.com
   - terminator --working-directory=~/projects/python/stuff
   
-
+  (Every line has to define a __Title__, **OR** a __Command__ or both)
+  
 - __Monitor__(optional): Monitor name (check your monitor names with xrandr) If a definition specifies a monitor not present or if is empty, window will be placed in the main monitor of the actual environment.
   - Use monitor when specified.
   - Use main monitor if monitor name is not found.
   - Use main monitor if __Monitor__ is not provided.
   
 - __X__(mandatory): Absolute or relative. Horizontal top left coordinate to place the window:
-  - Absolute (pixels): ie 100, 200, 250.
+  - Absolute (monitor width): ie 100, 200, 250.
   - Relative (monitor workarea): 10%, 20%, 50%. Percentage has to be an integer between 0 and 100. 
 
 - __Y__(mandatory): Absolute or relative. Vertical top left coordinate to place the window:
-  - Absolute (pixels): ie 100, 200, 250.
+  - Absolute (monitor monitor height): ie 100, 200, 250.
   - Relative (monitor workarea): 10%, 20%, 50%. Percentage has to be an integer between 0 and 100. 
+  
+  The work area should be considered when positioning menus and similar popups, to avoid placing them below panels, docks or other desktop components.
+  ![workarea image](/assets/images/workarea.jpg)
 
 - __Width__(mandatory): Absolute (pixels) or relative (workarea) Window width. Examples: 100, 50%. 
 
