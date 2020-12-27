@@ -11,17 +11,13 @@ module Sapristi
     end
 
     def run(args)
-      options = ArgumentsParser.new.parse args
-      build(options)
-
-      if options.show_monitors
-        MonitorManager.new.show_monitors
-        return
-      end
-
-      options.file ? @sapristi.run(options.file) : @sapristi.run
+      @options = ArgumentsParser.new.parse args
+      setup
+      process
     rescue Error => e
       exit_error 1, e.message
+    rescue OptionParser::InvalidOption => e
+      exit_error 1, "Error: #{e}, check sapristi -h"
     rescue StandardError => e
       error_file = save_stacktrace e
 
@@ -30,10 +26,16 @@ module Sapristi
 
     private
 
-    def build(options)
-      @sapristi.verbose! if options.verbose
-      @sapristi.dry! if options.dry
-      @sapristi.filter!(options.group) if options.group
+    def process
+      return MonitorManager.new.show_monitors if @options.show_monitors
+
+      @options.file ? @sapristi.run(@options.file) : @sapristi.run
+    end
+
+    def setup
+      @sapristi.verbose! if @options.verbose
+      @sapristi.dry! if @options.dry
+      @sapristi.filter!(@options.group) if @options.group
     end
 
     def save_stacktrace(error)

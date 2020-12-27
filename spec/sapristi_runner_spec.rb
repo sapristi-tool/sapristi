@@ -86,6 +86,15 @@ module Sapristi
             expect(error.status).to eq(1)
           end
         end
+
+        it 'returns 1 when invalid arguments' do
+          allow($stderr).to receive(:puts)
+
+          expect { subject.run ['-invalidoption'] }.to raise_error(SystemExit) do |error|
+            expect(error.status).to eq(1)
+            validate_error_mesage(/Error: invalid option: -invalidoption/)
+          end
+        end
       end
 
       context('unexpected errors') do
@@ -124,11 +133,10 @@ module Sapristi
             validate_error_mesage error_regex
           end
         end
-
-        def validate_error_mesage(error_regex)
-          expect($stderr).to have_received(:puts)
-            .with(->(error_line) { expect(error_line).to match(error_regex) })
-        end
+      end
+      def validate_error_mesage(error_regex)
+        expect($stderr).to have_received(:puts)
+          .with(->(error_line) { expect(error_line).to match(error_regex) })
       end
     end
   end

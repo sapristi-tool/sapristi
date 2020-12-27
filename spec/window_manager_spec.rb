@@ -9,8 +9,8 @@ module Sapristi
     before(:each) { @windows = [] }
     after(:each) { @windows.each { |window| subject.close(window) } }
 
-    def launch_n_windows(number_of_windows, command = 'sol')
-      number_of_windows.times { |_i| @windows.push NewProcessWindowDetector.new.detect_window_for_process(command, nil) }
+    def launch_n_windows(number_of_windows, cmd = 'sol')
+      number_of_windows.times { @windows.push NewProcessWindowDetector.new.detect_window_for_process(cmd, nil) }
       sleep 0.25
       @windows
     end

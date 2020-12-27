@@ -7,6 +7,7 @@ module Sapristi
       @definition_processor = definition_processor
       @dry = false
       @verbose = false
+      @group = nil
     end
 
     def run(conf_file = Sapristi.user_default_configuration_file)

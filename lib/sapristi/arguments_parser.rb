@@ -21,6 +21,7 @@ module Sapristi
     end
 
     # This method smells of :reek:TooManyStatements
+    # rubocop:disable  Metrics/AbcSize
     def self.populate_options(opts, args)
       opts.banner = 'Usage: sapristi [options]'
       opts.on('-v', '--verbose', 'Verbose mode') { |value| args.verbose = value }
@@ -33,5 +34,6 @@ module Sapristi
       end
       opts.on('-m', '--monitors', 'Show monitor\'s info') { args.show_monitors = true }
     end
+    # rubocop:enable  Metrics/AbcSize
   end
 end
