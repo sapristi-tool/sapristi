@@ -14,6 +14,11 @@ module Sapristi
       options = ArgumentsParser.new.parse args
       build(options)
 
+      if options.show_monitors
+        MonitorManager.new.show_monitors
+        return
+      end
+
       options.file ? @sapristi.run(options.file) : @sapristi.run
     rescue Error => e
       exit_error 1, e.message

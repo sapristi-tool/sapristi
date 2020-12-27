@@ -9,6 +9,7 @@ module Sapristi
   RSpec.describe Runner do
     let(:runner_path) { File.join 'bin', 'sapristi' }
     subject { Runner.new }
+    # before(:each) { allow(subject).to receive(:exit_error) }
 
     it 'is executable' do
       expect(File.executable?(runner_path)).to be_truthy
@@ -18,6 +19,11 @@ module Sapristi
       expect_any_instance_of(Sapristi).to receive(:run).with(no_args)
 
       subject.run []
+    end
+
+    it 'shows monitor\'s info' do
+      allow_any_instance_of(Sapristi).to receive(:run).with(no_args)
+      expect { subject.run ['-m'] }.to output(/Monitors: [0-9]+.*/).to_stdout
     end
 
     it 'calls sapristi run with verbose' do
