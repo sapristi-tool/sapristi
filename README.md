@@ -32,6 +32,8 @@ Install gem
   
   > `-m|--monitors` show available monitors info (including work area size) and exits
 
+  > `-w|--wait-time wait-time-in-seconds` set wait time for detecting a window (default: 30)
+
 
 ### Configuration example: ~/.sapristi.csv
 
