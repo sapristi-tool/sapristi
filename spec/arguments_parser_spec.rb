@@ -31,6 +31,10 @@ module Sapristi
       it 'wait_time is an integer' do
         expect { subject.parse(['-w', '10.0']) }.to raise_error(OptionParser::InvalidOption, /-w \'10.0\' is not an integer/)
       end
+
+      it 'is a positive number' do
+        expect { subject.parse(['-w', '0']) }.to raise_error(OptionParser::InvalidOption, /-w requires a wait time > 0, provided=0/)
+      end
     end
 
     it 'can enable verbose mode' do

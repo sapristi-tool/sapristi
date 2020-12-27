@@ -26,7 +26,7 @@ module Sapristi
       opts.banner = 'Usage: sapristi [options]'
       opts.on('-v', '--verbose', 'Verbose mode') { |value| args.verbose = value }
       opts.on('-g', '--group GROUP', 'Use named group definitions') { |value| args.group = value }
-      opts.on('-w', '--wait NUMBER_OF_SECONDS', 'Wait time for detecting a window') { |value| args.wait = parse_integer(value) }
+      opts.on('-w', '--wait NUMBER_OF_SECONDS', 'Wait time for detecting a window') { |value| args.wait = parse_integer(value, 1) }
       opts.on('--dry-run', 'Dry run') { |value| args.dry = value }
       opts.on('-f', '--file FILE', 'Read configuration from FILE') { |file| args.file = file }
       opts.on('-h', '--help', 'Prints this help') do
@@ -40,7 +40,10 @@ module Sapristi
     def self.parse_integer(value, min = nil, max = nil)
       raise OptionParser::InvalidOption, "'#{value}' is not an integer" unless value.match /^[0-9]+$/
 
-      value.to_i
+      integer = value.to_i
+      raise OptionParser::InvalidOption, "requires a wait time > 0, provided=#{value}" unless min.nil? || integer >= min
+
+      integer
     end
   end
 end
