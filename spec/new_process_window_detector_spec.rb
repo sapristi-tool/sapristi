@@ -24,6 +24,15 @@ module Sapristi
       end
     end
 
+    it 'honors wait_time' do
+      wait_time = 2
+      start_time = Time.now
+      expect { subject.detect_window_for_process("sleep 5", nil, wait_time) }
+        .to raise_error(Error, /it didn't open a window/)
+
+      expect(Time.now - start_time).to be_within(0.3).of(wait_time)
+    end
+
     context('New process per window') do
       let(:command) { 'sol' }
       # let(:waiter) do
