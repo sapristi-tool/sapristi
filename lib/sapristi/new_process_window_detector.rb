@@ -47,9 +47,9 @@ module Sapristi
       start_time = Time.now
 
       while Time.now - start_time < timeout_in_seconds # && waiter.alive?
-        process_window = detect_new_windows.find { |window| window_for?(waiter, program, title, window) }
+        new_window = detect_new_windows.find { |window| window_for?(waiter, program, title, window) }
 
-        return process_window if process_window
+        return new_window if new_window && !splash?(new_window)
 
         sleep 0.2
       end
@@ -104,6 +104,18 @@ module Sapristi
 
     def new_window?(window)
       !previous_windows_ids.include?(window.id)
+    end
+
+    def splash?(window)
+      skip_taskbar?(window) || skip_pager?(window)
+    end
+
+    def skip_taskbar?(window)
+      window.state.include? '_NET_WM_STATE_SKIP_TASKBAR'
+    end
+
+    def skip_pager?(window)
+      window.state.include? '_NET_WM_STATE_SKIP_PAGER'
     end
   end
 end

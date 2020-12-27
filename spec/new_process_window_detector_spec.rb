@@ -40,6 +40,20 @@ module Sapristi
         expect(actual_window).not_to be_nil
       end
 
+      it 'ignores windows with _NET_WM_STATE_SKIP_TASKBAR' do
+        allow(subject).to receive(:skip_taskbar?).and_return(true)
+
+        expect { subject.detect_window_for_process command, nil, 1 }.to raise_error(Error, /it didn't open a window/)
+        sleep 0.2 # close splash window created
+      end
+
+      it 'ignores windows with _NET_WM_STATE_SKIP_PAGER' do
+        allow(subject).to receive(:skip_pager?).and_return(true)
+
+        expect { subject.detect_window_for_process command, nil, 1 }.to raise_error(Error, /it didn't open a window/)
+        sleep 0.2 # close splash window created
+      end
+
       it 'window has the same pid as initial process' do
         actual_window = subject.detect_window_for_process command, nil, timeout
         @windows.push actual_window
