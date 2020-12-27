@@ -37,6 +37,14 @@ module Sapristi
       it 'main monitor when monitor name is nil' do
         expect(subject.get_monitor_or_main(nil)).to eq(main_monitor)
       end
+
+      it 'shows monitor info' do
+        expected = 'Monitors: 2
+0 main a-monitor 1000x2000 workarea[x=100, y=200, width=300, height=400]
+1      another-monitor 3000x4000 workarea[x=100, y=200, width=300, height=400]
+'
+        expect { subject.show_monitors }.to output(expected).to_stdout
+      end
     end
   end
 end

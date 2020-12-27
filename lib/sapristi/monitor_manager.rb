@@ -21,6 +21,13 @@ module Sapristi
       @os_manager.monitors
     end
 
+    def show_monitors
+      the_monitors = monitors
+
+      puts "Monitors: #{the_monitors.size}"
+      the_monitors.each_value { |monitor| puts monitor }
+    end
+
     private
 
     def monitor_present?(name)
