@@ -31,6 +31,7 @@ module Sapristi
         puts opts
         exit
       end
+      opts.on('-m', '--monitors', 'Show monitor\'s info') { args.show_monitors = true }
     end
   end
 end

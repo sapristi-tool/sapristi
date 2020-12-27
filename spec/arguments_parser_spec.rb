@@ -13,6 +13,11 @@ module Sapristi
       expect(subject.parse(['--group', group]).group).to eq(group)
     end
 
+    it 'show monitors' do
+      expect(subject.parse(['-m']).show_monitors).to be_truthy
+      expect(subject.parse(['--monitors']).show_monitors).to be_truthy
+    end
+
     it 'default group is nil' do
       expect(subject.parse([]).group).to be_nil
     end
