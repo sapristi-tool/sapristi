@@ -36,6 +36,7 @@ module Sapristi
       @sapristi.verbose! if @options.verbose
       @sapristi.dry! if @options.dry
       @sapristi.filter!(@options.group) if @options.group
+      @sapristi.wait_time!(@options.wait_time) if @options.wait_time
     end
 
     def save_stacktrace(error)

@@ -40,6 +40,13 @@ module Sapristi
       subject.run ['-f', expected_file]
     end
 
+    it 'passes wait time' do
+      allow_any_instance_of(Sapristi).to receive(:run)
+
+      expect_any_instance_of(Sapristi).to receive(:wait_time!).with(5)
+      subject.run ['-w', '5']
+    end
+
     it 'calls sapristi run dry' do
       expect_any_instance_of(Sapristi).to receive(:dry!)
       allow_any_instance_of(Sapristi).to receive(:run)
