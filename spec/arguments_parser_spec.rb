@@ -22,6 +22,17 @@ module Sapristi
       expect(subject.parse([]).group).to be_nil
     end
 
+    context 'wait time' do
+      it 'reads wait time' do
+        expect(subject.parse(['-w', '10']).wait).to eq(10)
+        expect(subject.parse(['--wait', '10']).wait).to eq(10)
+      end
+
+      it 'wait_time is an integer' do
+        expect { subject.parse(['-w', '10.0']) }.to raise_error(OptionParser::InvalidOption, /-w \'10.0\' is not an integer/)
+      end
+    end
+
     it 'can enable verbose mode' do
       expect(subject.parse(['-v']).verbose).to be_truthy
       expect(subject.parse(['--verbose']).verbose).to be_truthy
