@@ -27,7 +27,7 @@ module Sapristi
       opts.banner = 'Usage: sapristi [options]'
       opts.on('-v', '--verbose', 'Verbose mode') { |value| args.verbose = value }
       opts.on('-g', '--group GROUP', 'Use named group definitions') { |value| args.group = value }
-      opts.on('-w', '--wait-time NUMBER_OF_SECONDS (1-120)', 'Wait time for detecting a window') do |value|
+      opts.on('-w', '--wait-time NUMBER_OF_SECONDS (1-120), default=30', 'Wait time for detecting a window') do |value|
         args.wait_time = parse_integer(value, 1, 120)
       end
       opts.on('--dry-run', 'Dry run') { |value| args.dry = value }
