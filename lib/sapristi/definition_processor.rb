@@ -5,7 +5,7 @@ module Sapristi
     def initialize(window_manager = WindowManager.new, process_manager = NewProcessWindowDetector.new)
       @window_manager = window_manager
       @process_manager = process_manager
-      @wait_time = nil
+      @wait_time = 30
     end
 
     attr_accessor :wait_time
@@ -24,7 +24,7 @@ module Sapristi
 
     def get_window(title, command)
       (title && find_one_by_title(title)) ||
-        (command && @process_manager.detect_window_for_process(command, title)) ||
+        (command && @process_manager.detect_window_for_process(command, title, @wait_time)) ||
         raise(Error, "Couldn't produce a window for this definition")
     end
 

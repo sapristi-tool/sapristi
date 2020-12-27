@@ -14,7 +14,7 @@ module Sapristi
         definition = build(:a_valid_definition, attrs: { 'Command' => command, 'Title' => nil })
         DefinitionProcessor.new(spy('window_manager'), window_detector).process_definition(definition)
 
-        expect(window_detector).to have_received(:detect_window_for_process).with(command, nil)
+        expect(window_detector).to have_received(:detect_window_for_process).with(command, nil, anything)
       end
 
       let(:window_manager) { spy('window_manager') }
@@ -27,6 +27,16 @@ module Sapristi
         DefinitionProcessor.new(window_manager).process_definition(definition)
 
         expect(window_manager).to have_received(:move_resize).with(window, any_args)
+      end
+
+      it 'uses wait_time' do
+        detector = NewProcessWindowDetector.new
+        allow(detector).to receive(:detect_window_for_process)
+        subject = DefinitionProcessor.new(nil, detector)
+
+        subject.wait_time = 22
+        expect { subject.send(:get_window, nil, 'some') }.to raise_error Error
+        expect(detector).to have_received(:detect_window_for_process).with(anything, anything, 22)
       end
 
       context('raises an error') do
