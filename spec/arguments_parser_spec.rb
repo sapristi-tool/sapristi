@@ -24,16 +24,20 @@ module Sapristi
 
     context 'wait time' do
       it 'reads wait time' do
-        expect(subject.parse(['-w', '10']).wait).to eq(10)
-        expect(subject.parse(['--wait', '10']).wait).to eq(10)
+        expect(subject.parse(['-w', '10']).wait_time).to eq(10)
+        expect(subject.parse(['--wait-time', '10']).wait_time).to eq(10)
       end
 
       it 'wait_time is an integer' do
-        expect { subject.parse(['-w', '10.0']) }.to raise_error(OptionParser::InvalidOption, /-w \'10.0\' is not an integer/)
+        expect { subject.parse(['-w', '10.0']) }.to raise_error(OptionParser::InvalidOption, /-w '10.0' is not an integer/)
       end
 
       it 'is a positive number' do
         expect { subject.parse(['-w', '0']) }.to raise_error(OptionParser::InvalidOption, /-w requires a wait time > 0, provided=0/)
+      end
+
+      it 'is less than 2 minutes' do
+        expect { subject.parse(['-w', '121']) }.to raise_error(OptionParser::InvalidOption, /-w requires a wait time <= 120 seconds, provided=121/)
       end
     end
 
