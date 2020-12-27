@@ -5,7 +5,10 @@ module Sapristi
     def initialize(window_manager = WindowManager.new, process_manager = NewProcessWindowDetector.new)
       @window_manager = window_manager
       @process_manager = process_manager
+      @wait_time = nil
     end
+
+    attr_accessor :wait_time
 
     def process_definition(definition)
       window = get_window definition.title, definition.command

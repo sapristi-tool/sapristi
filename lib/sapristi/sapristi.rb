@@ -33,6 +33,10 @@ module Sapristi
       logger.level = :info if logger.level > Logger::INFO
     end
 
+    def wait_time!(wait_time)
+      @definition_processor.wait_time = wait_time
+    end
+
     def filter!(group)
       @group = group
     end

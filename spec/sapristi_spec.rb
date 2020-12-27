@@ -19,6 +19,15 @@ module Sapristi
       expect(configuration_loader).to have_received(:load).with(File.join(Dir.home, '.sapristi.csv'))
     end
 
+    it 'passes wait_time to definition processor' do
+      definition_processor = DefinitionProcessor.new
+
+      under_test = Sapristi.new(definition_processor: definition_processor)
+      under_test.wait_time! 15
+
+      expect(definition_processor.wait_time).to eq(15)
+    end
+
     it('creates empty configuration file if it does not exist') do
       configuration_loader = ConfigurationLoader.new
       under_test = Sapristi.new(configuration_loader: configuration_loader)
