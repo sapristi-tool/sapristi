@@ -22,11 +22,15 @@ Install gem
 
   > `-f FILE` load your definitions from another file, ie: sapristi -f ~/machine_learning_definitions.csv
 
-  > `-v | --verbose` verbose mode.
+  > `-v | --verbose` verbose mode
 
-  > `--dry-run` dry mode, show your definitions but it doesn't execute them.
+  > `--dry-run` dry mode, show your definitions but it doesn't execute them
 
   > `-g|--group name` load definitions tagged with group, ie: sapristi -g social
+  
+  > `-h|--help` show help
+  
+  > `-m|--monitors` show available monitors info (including work area size) and exits
 
 
 ### Configuration example: ~/.sapristi.csv
